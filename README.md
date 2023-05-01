@@ -4,24 +4,20 @@ This is a project for a Book Scrabble game, where players will compete to create
 
 ## Table of Contents
 
-1.roles of the group
-2.video links
+1.Collaborators
+2.Video links
 3.Game role 
 4.Game Overview
-5.Game Board
-6. Vision
-7. Planning
-8. Gantt Chart
+5.Usage
+6.Vision
+7.Planning
+8.Gantt Chart
 
-## roles of the group 
-
-The team will be divided into the following roles:
-
-- Chen: Project Manager
-- Nir: Frontend Developer
-- Uri: Backend Developer
-- Dorin: Quality Assurance
-- 
+## Collaborators
+* [Dorin Cohen](https://github.com/Dorins12)
+* [Nir Miranda](https://github.com/NirMiranda)
+* [Ori Farkash](https://github.com/orifarkash)
+* [Chen Amrani](https://github.com/chenAmrani)
 ## Video links
  * Demo video of the board  - will be added
  * Project presentation video - will be added
@@ -52,12 +48,29 @@ The Book Scrabble game is played on a board that is 15x15 squares in size. Playe
 - Squares that double the value of the entire word (yellow).
 - Squares that triple the value of the entire word (red).
 
-## Game Board
+## Usage
+* Game Board
 
 The game board is a 15x15 grid of squares, with the bonus slots marked as described above. Players will place their letter tiles on the board to create words, and score points based on the value of those tiles and the placement of their words on the board.
 * The borad will loke like the following diagram that we create :
 
 <img src="https://user-images.githubusercontent.com/118439273/229484247-4854a0a0-7e4f-4f2d-9e87-60fadd52d077.png" width="520" height="520" />
+
+* Tille 
+ As part of our project, we have simplified the rules of the game. Here's what you need to know:
+ The game board is small and includes English letters with assigned point values.
+ * Check out the diagram below to see how many points each letter is worth in the game:
+ 
+ <img src="https://user-images.githubusercontent.com/118439273/229486188-1f5ab09f-8f78-4e12-b2d1-8aea60616c7c.png" width="360" height="180" />
+ 
+ * Bag
+There are a total of 98 tiles in the bag.
+The bag allows for randomization of the tiles.
+At the beginning of the game, each letter has a specific number of tiles in the bag.
+
+<img src="https://user-images.githubusercontent.com/118439273/229486334-5985074d-ffa1-4366-bc21-8acfd1d4445d.png" width="1080" height="120" />
+ 
+ 
 
 ## Vision
 
