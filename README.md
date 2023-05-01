@@ -1,6 +1,6 @@
 # Book Scrabble Game
 
-This is a project for a Book Scrabble game, where players will compete to create words and score points based on the tiles they use and the placement of those tiles on the board. The game will be built by a team of four developers: Chen, Nir, Uri, and Dorin. Each team member will be assigned a specific role to help with the development of the game.
+This is a project for a Book Scrabble game, where players will compete to create words and score points based on the tiles they use and the placement of those tiles on the board. The game will be built by a team of four developers: Chen, Nir, Ori, and Dorin. Each team member will be assigned a specific role to help with the development of the game.
 
 ## Table of Contents
 
