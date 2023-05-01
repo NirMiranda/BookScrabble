@@ -55,7 +55,8 @@ The Book Scrabble game is played on a board that is 15x15 squares in size. Playe
 ## Game Board
 
 The game board is a 15x15 grid of squares, with the bonus slots marked as described above. Players will place their letter tiles on the board to create words, and score points based on the value of those tiles and the placement of their words on the board.
-*The borad will loke like the following diagram that we create :
+* The borad will loke like the following diagram that we create :
+
 <img src="https://user-images.githubusercontent.com/118439273/229484247-4854a0a0-7e4f-4f2d-9e87-60fadd52d077.png" width="520" height="520" />
 
 ## Vision
