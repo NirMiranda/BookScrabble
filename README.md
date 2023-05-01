@@ -5,12 +5,19 @@ This is a project for a Book Scrabble game, where players will compete to create
 ## Table of Contents
 
 1.Collaborators
+
 2.Video links
+
 3.Game role 
+
 4.Game Overview
+
 5.Usage
+
 6.Vision
+
 7.Planning
+
 8.Gantt Chart
 
 ## Collaborators
