@@ -84,7 +84,7 @@ At the beginning of the game, each letter has a specific number of tiles in the 
 The vision for the Book Scrabble game is to create an engaging and fun experience for players of all ages. The game should be easy to learn, but challenging to master, with strategic gameplay and a variety of different ways to score points.
 
 * our vision to our app :
-<img src="https://i.ibb.co/hdsyVnM/Whats-App-Image-2023-05-02-at-17-39-10.jpg" width="650" height="520" />
+<img src="https://i.ibb.co/hdsyVnM/Whats-App-Image-2023-05-02-at-17-39-10.jpg" width="720" height="520" />
 
 
 ## Planning
