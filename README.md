@@ -61,7 +61,7 @@ The Book Scrabble game is played on a board that is 15x15 squares in size. Playe
 The game board is a 15x15 grid of squares, with the bonus slots marked as described above. Players will place their letter tiles on the board to create words, and score points based on the value of those tiles and the placement of their words on the board.
 * The borad will loke like the following diagram that we create :
 
-<img src="https://user-images.githubusercontent.com/118439273/229484247-4854a0a0-7e4f-4f2d-9e87-60fadd52d077.png" width="520" height="520" />
+<img src="https://i.ibb.co/zs2XMr8/Whats-App-Image-2023-05-02-at-17-41-45.jpg" width="520" height="520" />
 
 * Tille 
  As part of our project, we have simplified the rules of the game. Here's what you need to know:
@@ -82,6 +82,10 @@ At the beginning of the game, each letter has a specific number of tiles in the 
 ## Vision
 
 The vision for the Book Scrabble game is to create an engaging and fun experience for players of all ages. The game should be easy to learn, but challenging to master, with strategic gameplay and a variety of different ways to score points.
+
+* our vision to our app :
+<img src="https://i.ibb.co/hdsyVnM/Whats-App-Image-2023-05-02-at-17-39-10.jpg" width="650" height="520" />
+
 
 ## Planning
 
