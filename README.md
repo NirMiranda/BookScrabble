@@ -102,6 +102,6 @@ The team will work on the project from now until 30.06 To meet this deadline, we
 
 Here is a Gantt chart showing the planned timeline for the project:
 
-![Gantt Chart](gantt_chart.png)
+<img src="https://i.ibb.co/h8kGssS/Model.jpg" width="720" height="520" />
 
 This chart shows the planned tasks for each week of the project, along with their estimated duration and dependencies. We will use this chart to help us stay on track and ensure that we meet our deadline of 30.06.
