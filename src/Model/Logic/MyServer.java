@@ -23,9 +23,13 @@ public class MyServer {
         try {
             server=new ServerSocket(port);
             server.setSoTimeout(1000);
+            System.out.println("Server started. Waiting for client connections...");
+            System.out.flush();
             while(!stop){
                 try{
                     aClient=server.accept(); // blocking call
+                    System.out.println("Client connected: " + aClient.getInetAddress().getHostAddress());
+
                     try {
                         ch.handleClient(aClient.getInputStream(), aClient.getOutputStream());
                         ch.close();
@@ -35,8 +39,9 @@ public class MyServer {
             }
             server.close();
         }
-        catch(IOException e) {}
-        finally {
+        catch(IOException e) {
+        }finally {
+            // Close the client and server sockets in case of any exceptions
             try {
                 if(aClient!=null && !aClient.isClosed())
                     aClient.close();
