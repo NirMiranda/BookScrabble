@@ -5,8 +5,7 @@ import java.util.ArrayList;
 
 
 public class Board {
-
-
+    int i =0;
     private static Board b = null;
     int num=0;
     Tile[][] table = new Tile[15][15];
