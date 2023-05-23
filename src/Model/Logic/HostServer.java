@@ -138,10 +138,13 @@ public class HostServer extends Observable {
             }
 }
     public void send(String letter , String word ){
-        Socket myServer = new Socket(String.valueOf(myServerIP),myServerPort);
-        OutputStream outputStream = myServer.getOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-        writer.write(message);
+        Socket myServer = new Socket(myServerIP,myServerPort);
+        PrintWriter outputStream = new PrintWriter(myServer.getOutputStream());
+        StringBuilder message = new StringBuilder();
+        message.append(";");
+
+
+
     }
 
     }
