@@ -1,23 +1,21 @@
 package Model.Logic;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Observable;
-/*
+
 public class HostServer extends Observable {
     private int hostPort;
     private int myServerPort;
-    private int myServerIP;
+    private String myServerIP;
     private volatile boolean stop;
     private ClientHandler clientHandler;
-
     private HashMap<Integer, Socket> clientsMap;
-    //books list?
+
+    //private List<String> booksName;
 
 
     /**
@@ -30,7 +28,7 @@ public class HostServer extends Observable {
      * @param clientHandler implementation interface to solve query received from the clients
      * clientsMap --> to keep track of the connected clients in the HostServer class
      */
-/*
+
     public HostServer(int hostPort, int myServerPort, int myServerIP, boolean stop, ClientHandler clientHandler) {
         this.hostPort = hostPort;
         this.myServerPort = myServerPort;
@@ -76,7 +74,7 @@ public class HostServer extends Observable {
     /**
      * check ForMessage method is responsible for continuous review of incoming messages from clients
      */
-/*
+
     private void checkForMessage() {
         // Assuming that the clientsMap contains the client sockets
         while (!stop) {
@@ -124,7 +122,7 @@ public class HostServer extends Observable {
            // updateAllClient("1;serverClosed");
         }
 
-        /*
+
 
     private void updateAllClient(String message) {
             // Iterate over the connected clients
@@ -139,10 +137,16 @@ public class HostServer extends Observable {
                 }
             }
 }
+    public void send(String letter , String word ){
+        Socket myServer = new Socket(String.valueOf(myServerIP),myServerPort);
+        OutputStream outputStream = myServer.getOutputStream();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+        writer.write(message);
+    }
 
     }
 
- */
+
 
 
 
