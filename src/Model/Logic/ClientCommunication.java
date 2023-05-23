@@ -71,6 +71,7 @@ public class ClientCommunication extends Observable {
         messageBuilder.append(String.valueOf(id));
         messageBuilder.append(";"); // Delimiter between ID and method name
         messageBuilder.append(methodName);
+        messageBuilder.append(";");
 
         // Append arguments if present
         if (args != null && args.length > 0) {

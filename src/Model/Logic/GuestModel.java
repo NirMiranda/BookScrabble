@@ -70,6 +70,8 @@ public class GuestModel extends PlayerModel implements Observer<ClientCommunicat
     public List<Tile> getMyTiles() {
         return null;
     }
+}
+
 
 
 
