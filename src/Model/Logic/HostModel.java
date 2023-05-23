@@ -6,6 +6,7 @@ import Model.Data.Tile;
 import java.util.HashMap;
 import java.util.Observer;
 
+
 public class HostModel extends PlayerModel implements Observer<HostServer> {
     private HashMap<Integer,Player> connectedPlayers;
     private HostServer hostServer;

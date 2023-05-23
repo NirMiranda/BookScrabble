@@ -7,7 +7,6 @@ import java.util.Observable;
 public class ClientCommunication extends Observable {
 
     Socket socket;
-
     //ip
     //port
 

@@ -9,7 +9,8 @@ public class HostServer extends Observable {
     private Socket[] clientsSockets;
     private ClientHandler clientHandler;
 
-    private void updateAllClient(){
+    private void updateAllClient(){}
         //?
+
     }
-}
+
