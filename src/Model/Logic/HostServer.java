@@ -29,7 +29,7 @@ public class HostServer extends Observable {
      * clientsMap --> to keep track of the connected clients in the HostServer class
      */
 
-    public HostServer(int hostPort,int myServerPort, String myServerIP, boolean stop, ClientHandler clientHandler) {
+    public HostServer(int hostPort,int myServerPort, String myServerIP,boolean stop, ClientHandler clientHandler) {
         this.hostPort = hostPort;
         this.myServerPort = myServerPort;
         this.myServerIP = myServerIP;
