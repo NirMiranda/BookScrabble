@@ -15,7 +15,7 @@ public class HostServer extends Observable {
     private ClientHandler clientHandler;
     private HashMap<Integer, Socket> clientsMap;
 
-    //private List<String> booksName;
+    private List<String> listBooks;
 
 
     /**
@@ -123,7 +123,10 @@ public class HostServer extends Observable {
         }
 
 
-
+    /**
+     * This function will update every socket about any message.
+     * @param message The message needs to be update all the sockets
+     */
     private void updateAllClient(String message) {
             // Iterate over the connected clients
             for (Socket clientSocket : clientsMap.values()) {
@@ -138,17 +141,57 @@ public class HostServer extends Observable {
             }
 }
 
-    public void send(String letter , String word ){
-        Socket myServer = new Socket(myServerIP,myServerPort);
-        PrintWriter outputStream = new PrintWriter(myServer.getOutputStream());
-        StringBuilder message = new StringBuilder();
-        message.append(";");
-
-
-
+    /**
+     * This method is send to MyServer the letter('q'-query or 'c'); books name; word
+     * @param letter can be 'q'-query or 'c'-challenge
+     * @param word the word that the user wants to place
+     */
+    public void sendToMyServer(String letter , String word ){
+        try {
+            Socket myServer = new Socket(myServerIP, myServerPort);
+            PrintWriter myServerOut = new PrintWriter(myServer.getOutputStream());
+            StringBuilder message = new StringBuilder();
+            message.append(letter);
+            for (String book : listBooks) {
+                message.append(book + ",");
+            }
+            message.append(word);
+            myServerOut.print(message);
+            myServerOut.print("\n");
+            myServerOut.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * This function is send a answer to the player.
+     * @param id the id of the player
+     * @param method the method that that has been sent to the server
+     * @param answer the answer that the hostServer is giving back
+     */
+
+    public void sendToPlayerMessage(int id, String method, String answer) {
+        Socket clientSocket = clientsMap.get(id);
+        if (clientSocket != null) {
+            try {
+                OutputStream outputStream = clientSocket.getOutputStream();
+                PrintWriter clientOut = new PrintWriter(outputStream);
+                StringBuilder message = new StringBuilder();
+                message.append(method).append(";").append(answer);
+                clientOut.println(message);
+                clientOut.flush();
+            } catch (IOException e) {
+                // Handle any exceptions that occur while sending the message to the client
+                e.printStackTrace();
+            }
+        }else{
+            throw new RuntimeException("The player with id: "+id+"is not connected to the server");
+        }
     }
+
+
+}
 
 
 
