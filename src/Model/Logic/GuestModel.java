@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-
+/*
 public class GuestModel extends PlayerModel implements Observer<ClientCommunication> {
     ClientCommunication clientCommunication;
 
@@ -72,6 +72,6 @@ public class GuestModel extends PlayerModel implements Observer<ClientCommunicat
     }
 }
 
-
+*/
 
 
