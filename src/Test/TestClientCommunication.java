@@ -1,10 +1,8 @@
 package Test;
 
 import Model.Logic.ClientCommunication;
-//import jdk.incubator.vector.VectorOperators;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Observable;
@@ -55,6 +53,11 @@ public class TestClientCommunication {
             else {
                 System.out.println(" Good job,message for the second guest received ,CheckForMessage work!:) ");
             }
+            socket.close();
+            socket2.close();
+            server.close();
+            Guestclient2.close();
+            Guestclient.close();
 
 
         } catch (IOException e) {
@@ -68,8 +71,7 @@ public class TestClientCommunication {
     {
         System.out.println("checking Checkformessage methode");
         testCheckForMessage();
-        return;
-
+        System.out.println("Tests finished successfully,ClientCommunication is OK");
     }
 
 }
