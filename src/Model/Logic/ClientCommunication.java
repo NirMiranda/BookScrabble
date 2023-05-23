@@ -4,10 +4,22 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Observable;
 
+/**
+ * This class is responsible for the communication between the client and the server.
+ * Its sends message to the server and notifies the observers when a message is received.
+ * The protocol is: id;method;args1,args2,...
+ * The id is the id of the client, -1 means that the client is not connected yet.
+ */
+
 public class ClientCommunication extends Observable {
 
     Socket socket;
-    //ip
+
+    /**
+     * Creates a new client communication with the server and starts a new thread.
+     * @param ip the host to connect to
+     * @param port the port to connect to
+     */
     //port
 
     public ClientCommunication(String ip, int port){
@@ -30,6 +42,13 @@ public class ClientCommunication extends Observable {
         messageThread.start();
     }
 
+    /**
+     * Sends a message to the server, protocol: id;method;args1,args2,...
+     * @param id the id of the client
+     * @param methodName the method name to call
+     * @param args the args to the method
+     */
+
     public void send(int id,String methodName, String...args){
             try {
                 String message = updateMessage(id, methodName, args);
@@ -44,6 +63,9 @@ public class ClientCommunication extends Observable {
             }
         }
 
+    /**
+     *make the message in format: id;method;args1,args2...
+     */
     private String updateMessage(int id, String methodName, String... args) {
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append(String.valueOf(id));
@@ -53,7 +75,7 @@ public class ClientCommunication extends Observable {
         // Append arguments if present
         if (args != null && args.length > 0) {
             for (String arg : args) {
-                messageBuilder.append(";"); // Delimiter between arguments
+                messageBuilder.append(","); // Delimiter between arguments
                 messageBuilder.append(arg);
             }
         }
