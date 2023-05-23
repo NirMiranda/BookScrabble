@@ -86,7 +86,6 @@ public class ClientCommunication extends Observable {
         if(socket!=null){
             try {
                 socket.close();
-
                 // Notify observers that the connection has been closed
                 setChanged();
                 notifyObservers("closed");
@@ -96,16 +95,17 @@ public class ClientCommunication extends Observable {
         }
     }
 
-    private void checkForMessage(){
+    private void checkForMessage() {
+        while (socket.isConnected() && !socket.isClosed()) {
             try {
                 InputStream inputStream = socket.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 String message;
-                while ((message = reader.readLine()) != null) {
+                if ((message = reader.readLine()) != null) {
                     setChanged();
                     notifyObservers(message);
-                    Thread.sleep(250);//after 1/4 sec it will check again.
                 }
+                Thread.sleep(250);//after 1/4 sec it will check again.
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -113,6 +113,8 @@ public class ClientCommunication extends Observable {
             }
         }
     }
+}
+
 
 
 
