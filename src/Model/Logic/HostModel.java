@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-
+/*
 public class HostModel extends PlayerModel implements Observer<HostServer> {
     private HashMap<Integer,Player> connectedPlayers;
     private HostServer hostServer;
@@ -89,3 +89,4 @@ public class HostModel extends PlayerModel implements Observer<HostServer> {
 
     }
 }
+*/

@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Observable;
-
+/*
 public class HostServer extends Observable {
     private int hostPort;
     private int myServerPort;
@@ -30,7 +30,7 @@ public class HostServer extends Observable {
      * @param clientHandler implementation interface to solve query received from the clients
      * clientsMap --> to keep track of the connected clients in the HostServer class
      */
-
+/*
     public HostServer(int hostPort, int myServerPort, int myServerIP, boolean stop, ClientHandler clientHandler) {
         this.hostPort = hostPort;
         this.myServerPort = myServerPort;
@@ -76,6 +76,7 @@ public class HostServer extends Observable {
     /**
      * check ForMessage method is responsible for continuous review of incoming messages from clients
      */
+/*
     private void checkForMessage() {
         // Assuming that the clientsMap contains the client sockets
         while (!stop) {
@@ -137,10 +138,11 @@ public class HostServer extends Observable {
                     e.printStackTrace();
                 }
             }
-        }
-                 */
+}
 
     }
+
+ */
 
 
 
