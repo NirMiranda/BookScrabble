@@ -29,7 +29,7 @@ public class HostServer extends Observable {
      * clientsMap --> to keep track of the connected clients in the HostServer class
      */
 
-    public HostServer(int hostPort, int myServerPort, int myServerIP, boolean stop, ClientHandler clientHandler) {
+    public HostServer(int hostPort,int myServerPort, String myServerIP,boolean stop, ClientHandler clientHandler) {
         this.hostPort = hostPort;
         this.myServerPort = myServerPort;
         this.myServerIP = myServerIP;
@@ -137,11 +137,15 @@ public class HostServer extends Observable {
                 }
             }
 }
+/*
     public void send(String letter , String word ){
-        Socket myServer = new Socket(String.valueOf(myServerIP),myServerPort);
-        OutputStream outputStream = myServer.getOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-        writer.write(message);
+        Socket myServer = new Socket(myServerIP,myServerPort);
+        PrintWriter outputStream = new PrintWriter(myServer.getOutputStream());
+        StringBuilder message = new StringBuilder();
+        message.append(";");
+*/
+
+
     }
 
     }
