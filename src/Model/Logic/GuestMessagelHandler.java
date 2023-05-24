@@ -16,6 +16,7 @@ public class GuestMessageHandler implements ClientHandler {
         // Do something with the answer...
         writer.println(answer);
         writer.flush();
+        ////
     }
 
     private String parseMessage(String message) {

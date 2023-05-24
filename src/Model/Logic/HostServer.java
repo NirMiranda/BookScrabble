@@ -40,9 +40,6 @@ public class HostServer extends Observable {
         this.start();
     }
 
-    public MyServer get serverSocket(){
-
-    }
 
     private void runServer() {
         ServerSocket server = null;
