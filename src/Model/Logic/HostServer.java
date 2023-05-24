@@ -35,7 +35,6 @@ public class HostServer extends Observable {
         this.myServerPort = myServerPort;
         this.myServerIP = myServerIP;
         this.stop = false;
-        this.clientHandler = clientHandler;
         this.clientsMap = new HashMap<>();
         this.start();
     }
