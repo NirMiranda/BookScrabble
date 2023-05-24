@@ -3,6 +3,7 @@ package Model.Logic;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
@@ -16,7 +17,7 @@ public class HostServer extends Observable {
     private ClientHandler clientHandler;
     private HashMap<Integer, Socket> clientsMap;
 
-    private List<String> listBooks;
+    private List<File> listBooks;
 
 
     /**
@@ -26,18 +27,30 @@ public class HostServer extends Observable {
      * @param myServerPort  the port of MyServer to connect to
      * @param myServerIP    the IP of MyServer to connect to
      * @param stop          indicate to know when to finish the loop
-     * @param clientHandler implementation interface to solve query received from the clients
+     * @param files implementation interface to solve query received from the clients
      * clientsMap --> to keep track of the connected clients in the HostServer class
      */
 
-    public HostServer(int hostPort,int myServerPort, String myServerIP,boolean stop) {
-        this.hostPort = hostPort;
-        this.myServerPort = myServerPort;
-        this.myServerIP = myServerIP;
-        this.stop = false;
-        this.clientsMap = new HashMap<>();
-        this.start();
-    }
+
+
+        public HostServer(int hostPort, int myServerPort, String myServerIP, boolean stop, File... files) {
+            this.hostPort = hostPort;
+            this.myServerPort = myServerPort;
+            this.myServerIP = myServerIP;
+            this.stop = stop;
+            this.clientsMap = new HashMap<>();
+            this.listBooks = new ArrayList<>();
+
+            for (File file : files) {
+                if (file.isFile()) {
+                    listBooks.add(file);
+                }
+            }
+
+            this.start();
+        }
+
+
 
 
     private void runServer() {
@@ -152,7 +165,7 @@ public class HostServer extends Observable {
             PrintWriter myServerOut = new PrintWriter(myServer.getOutputStream());
             StringBuilder message = new StringBuilder();
             message.append(letter);
-            for (String book : listBooks) {
+            for (File book : listBooks) {
                 message.append(book + ",");
             }
             message.append(word);

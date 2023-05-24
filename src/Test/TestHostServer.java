@@ -6,6 +6,8 @@ import Model.Logic.HostServer;
 import Model.Logic.MyServer;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Observable;
@@ -37,9 +39,19 @@ public class TestHostServer {
         ServerSocket serversocket=null;
         try{
             serversocket= new ServerSocket(3456); // Connecting the socket to the port of myServer
-            clientHandler=new GuestMessagelHandler("message");
+            clientHandler=new ClientHandler() {
+                @Override
+                public void handleClient(InputStream inFromclient, OutputStream outToClient) throws IOException {
+
+                }
+
+                @Override
+                public void close() {
+
+                }
+            };
             myserver= new MyServer(3456,clientHandler);
-            s1=new HostServer(2345,3456,"localMyServer",false,clientHandler);
+            s1=new HostServer(2345,3456,"localMyServer",false,);
             test1= new TestHostModel(s1);
             myserver.start();
             Socket socket = serversocket.accept();
