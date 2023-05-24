@@ -10,6 +10,7 @@ import java.util.Observable;
 public class HostServer extends Observable {
     private int hostPort;
     private int myServerPort;
+
     private String myServerIP;
     private volatile boolean stop;
     private ClientHandler clientHandler;
@@ -29,7 +30,7 @@ public class HostServer extends Observable {
      * clientsMap --> to keep track of the connected clients in the HostServer class
      */
 
-    public HostServer(int hostPort,int myServerPort, String myServerIP,boolean stop, ClientHandler clientHandler) {
+    public HostServer(int hostPort,int myServerPort, String myServerIP,boolean stop) {
         this.hostPort = hostPort;
         this.myServerPort = myServerPort;
         this.myServerIP = myServerIP;
