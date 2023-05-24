@@ -59,7 +59,10 @@ public class GuestModel extends PlayerModel implements Observer {
         clientCommunication.send(myPlayer.id, "challenge", word);
     }
 
-
+    @Override
+    public void setBoardStatus(Tile[][] board) {
+        return;
+    }
 
 
     /**
