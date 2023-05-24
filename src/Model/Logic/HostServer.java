@@ -127,7 +127,7 @@ public class HostServer extends Observable {
      *
      * @param message The message needs to be update all the sockets
      */
-    private void updateAllClient(String message) {
+    public void updateAllClient(String message) {
         // Iterate over the connected clients
         for (Socket clientSocket : clientsMap.values()) {
             try {

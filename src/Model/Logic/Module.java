@@ -18,7 +18,7 @@ public interface Module {
     public char[][] getBoardStatus();
     public int getNumberOfTilesInBag();
     public int getCurrentPlayerId();
-    public HashMap<Integer,Integer> getPlayersScores();
+//    public HashMap<Integer,Integer> getPlayersScores();
     public HashMap<Integer,String> getPlayersNumberOfTiles();
     public List<Tile> getMyTiles();
 
