@@ -9,26 +9,26 @@ public class MessageHandler implements ClientHandler {
 
     @Override
     public void handleClient(InputStream in, OutputStream out) throws IOException {
-        BufferedReader readerFromGuest = new BufferedReader(new InputStreamReader(in)); //read from the guest query.
+        BufferedReader fGuest = new BufferedReader(new InputStreamReader(in)); //read from the guest query.
         PrintWriter sendToGuest = new PrintWriter(out); //the answer to the guest will sent it in.
-        String message = readerFromGuest.readLine(); //read the first line from the guest.
+        String message = fGuest.readLine(); //read the first line from the guest.
         String[] msg = message.split(";"); // id;method;args...
         if (msg.length >= 3) {
             String id = msg[0];
             String method = msg[1];
             String args = msg[2];
             String[] argsArr = args.split(",");
-            Scanner fromBooksScrableServer = new Scanner(HostModel.getHost().GetSocketMyServer().getOutputStream().toString());
+            Scanner fServer = new Scanner(HostModel.getHost().GetSocketMyServer().getOutputStream().toString());
             String answerFromServer = "";
 
             //check here witch methodName
             if (method == "challege") {
                 hostServer.sendToMyServer("C", argsArr[0]); //send to the server the query from the guest to the server in format: ("C" , word)
-                answerFromServer = fromBooksScrableServer.nextLine(); //after get the message, the server will send the answer.
+                answerFromServer = fServer.nextLine(); //after get the message, the server will send the answer.
                 hostServer.notifyObservers(id + ":" + "challenge :" + args + "," + answerFromServer);
             } else if (method == "tryPlaceWord") {
                 hostServer.sendToMyServer("Q", argsArr[0]); //send to the server the query from the guest to the server in format: ("Q" , word)
-                answerFromServer = fromBooksScrableServer.nextLine(); //after get the message, the server will send the answer.
+                answerFromServer = fServer.nextLine(); //after get the message, the server will send the answer.
                 hostServer.notifyObservers(id + ":" + "tryPlaceWord :" + args + "," + answerFromServer);
             }
             /**
@@ -44,8 +44,11 @@ public class MessageHandler implements ClientHandler {
 
     @Override
     public void close() {
-
+        if (hostServer != null) {
+            hostServer.close(); // Close the host server if it is not null
+        }
     }
+
 }
 
 

@@ -14,7 +14,7 @@ public class HostServer extends Observable {
     private volatile boolean stop;
     private ClientHandler clientHandler;
     private HashMap<Integer, Socket> clientsMap;
-    private List<String> listBooks;
+    private List<File> listBooks;
 
     public Socket myServer;
 
@@ -25,7 +25,6 @@ public class HostServer extends Observable {
      * @param myServerPort  the port of MyServer to connect to
      * @param myServerIP    the IP of MyServer to connect to
      * @param stop          indicate to know when to finish the loop
-     * @param clientHandler implementation interface to solve query received from the clients
      *                      clientsMap --> to keep track of the connected clients in the HostServer class
      */
 
