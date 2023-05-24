@@ -37,7 +37,9 @@ public class GuestModel extends PlayerModel implements Observer {
         clientCommunication.send(myPlayer.id, "tryPlaceWord",word, String.valueOf(row), String.valueOf(col), String.valueOf(isVertical));
     }
 
-
+    public void placeTile(Tile tile,int row,int col){
+        clientCommunication.send(myPlayer.id,"placeTile",String.valueOf(tile.letter),String.valueOf(row),String.valueOf(col));
+    }
 
     @Override
     public void takeTileFromBag() {
@@ -60,7 +62,7 @@ public class GuestModel extends PlayerModel implements Observer {
     }
 
     @Override
-    public void setBoardStatus(Tile[][] board) {
+    public void setBoardStatus(Tile[][] board) { //may be a problem
         return;
     }
 
