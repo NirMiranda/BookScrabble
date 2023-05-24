@@ -3,7 +3,6 @@ package Model.Logic;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
@@ -11,14 +10,13 @@ import java.util.Observable;
 public class HostServer extends Observable {
     private int hostPort;
     private int myServerPort;
-
     private String myServerIP;
     private volatile boolean stop;
     private ClientHandler clientHandler;
     private HashMap<Integer, Socket> clientsMap;
+    private List<File> listBooks;
 
-    private List<File> listBooks; ////
-
+    public Socket myServer;
 
     /**
      * HostServer constructor creates new HostServer
@@ -27,36 +25,23 @@ public class HostServer extends Observable {
      * @param myServerPort  the port of MyServer to connect to
      * @param myServerIP    the IP of MyServer to connect to
      * @param stop          indicate to know when to finish the loop
-     * @param files implementation interface to solve query received from the clients
-     * clientsMap --> to keep track of the connected clients in the HostServer class
+     *                      clientsMap --> to keep track of the connected clients in the HostServer class
      */
 
-
-
-        public HostServer(int hostPort, int myServerPort, String myServerIP, boolean stop, File... files) {
-            this.hostPort = hostPort;
-            this.myServerPort = myServerPort;
-            this.myServerIP = myServerIP;
-            this.stop = stop;
-            this.clientsMap = new HashMap<>();
-            this.listBooks = new ArrayList<>();
-
-            for (File file : files) {
-                if (file.isFile()) {
-                    listBooks.add(file);
-                }
-            }
-
-            this.start();
-        }
-
-
+    public HostServer(int hostPort, int myServerPort, String myServerIP, boolean stop) {
+        this.hostPort = hostPort;
+        this.myServerPort = myServerPort;
+        this.myServerIP = myServerIP;
+        this.stop = false;
+        this.clientsMap = new HashMap<>();
+        this.start();
+    }
 
 
     private void runServer() {
         ServerSocket server = null;
         try {
-            server = new ServerSocket(myServerPort);
+            server = new ServerSocket(hostPort);
             //need to be here new thread.
             Thread clientThread = new Thread(this::checkForMessage);
             clientThread.start();
@@ -112,61 +97,64 @@ public class HostServer extends Observable {
         }
     }
 
-    public void start(){
-        new Thread(()->runServer()).start();
+    public void start() {
+        new Thread(() -> runServer()).start();
     }
 
     public void close() {
-            stop = true; // Set the stop flag to true to exit the server loop
+        stop = true; // Set the stop flag to true to exit the server loop
 
-            // Close all client connections
-            for (Socket clientSocket : clientsMap.values()) {
-                try {
-                    clientSocket.close();
-                } catch (IOException e) {}
+        // Close all client connections
+        for (Socket clientSocket : clientsMap.values()) {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
             }
-
-            // Clear the clients map
-            clientsMap.clear();
-
-            // Notify observers of the server closure
-            setChanged();
-            notifyObservers("Server closed");
-           // updateAllClient("1;serverClosed");
         }
+
+        // Clear the clients map
+        clientsMap.clear();
+
+        // Notify observers of the server closure
+        setChanged();
+        notifyObservers("Server closed");
+        // updateAllClient("1;serverClosed");
+    }
 
 
     /**
      * This function will update every socket about any message.
+     *
      * @param message The message needs to be update all the sockets
      */
     private void updateAllClient(String message) {
-            // Iterate over the connected clients
-            for (Socket clientSocket : clientsMap.values()) {
-                try {
-                    // Send the update message to each client
-                    clientSocket.getOutputStream().write(message.getBytes());
-                    clientSocket.getOutputStream().flush();
-                } catch (IOException e) {
-                    // Handle any exceptions that occur while sending the update
-                    e.printStackTrace();
-                }
+        // Iterate over the connected clients
+        for (Socket clientSocket : clientsMap.values()) {
+            try {
+                // Send the update message to each client
+                clientSocket.getOutputStream().write(message.getBytes());
+                clientSocket.getOutputStream().flush();
+            } catch (IOException e) {
+                // Handle any exceptions that occur while sending the update
+                e.printStackTrace();
             }
-}
+        }
+    }
 
     /**
      * This method is send to MyServer the letter('q'-query or 'c'); books name; word
+     *
      * @param letter can be 'q'-query or 'c'-challenge
-     * @param word the word that the user wants to place
+     * @param word   the word that the user wants to place
      */
-    public void sendToMyServer(String letter , String word ){
+    public void sendToMyServer(String letter, String word) {
         try {
-            Socket myServer = new Socket(myServerIP, myServerPort);
+            myServer = new Socket(myServerIP, myServerPort);
             PrintWriter myServerOut = new PrintWriter(myServer.getOutputStream());
             StringBuilder message = new StringBuilder();
             message.append(letter);
             for (File book : listBooks) {
-                message.append(book + ",");
+                message.append(book.getName() + ",");
             }
             message.append(word);
             myServerOut.print(message);
@@ -179,7 +167,8 @@ public class HostServer extends Observable {
 
     /**
      * This function is send a answer to the player.
-     * @param id the id of the player
+     *
+     * @param id     the id of the player
      * @param method the method that that has been sent to the server
      * @param answer the answer that the hostServer is giving back
      */
@@ -198,15 +187,10 @@ public class HostServer extends Observable {
                 // Handle any exceptions that occur while sending the message to the client
                 e.printStackTrace();
             }
-        }else{
-            throw new RuntimeException("The player with id: "+id+"is not connected to the server");
+        } else {
+            throw new RuntimeException("The player with id: " + id + "is not connected to the server");
         }
     }
 
 
 }
-
-
-
-
-

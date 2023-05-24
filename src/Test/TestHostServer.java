@@ -51,7 +51,7 @@ public class TestHostServer {
                 }
             };
             myserver= new MyServer(3456,clientHandler);
-            s1=new HostServer(2345,3456,"localMyServer",false,);
+            s1=new HostServer(2345,3456,"localMyServer",false);
             test1= new TestHostModel(s1);
             myserver.start();
             Socket socket = serversocket.accept();

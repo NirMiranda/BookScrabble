@@ -11,7 +11,7 @@ import java.util.Observer;
 
 
 public class HostModel extends PlayerModel implements Observer<HostServer> {
-    private HashMap<Integer,Player> connectedPlayers;
+    private HashMap<Integer, Player> connectedPlayers;
     private HostServer hostServer;
     private Board board;
     private Tile[][] prevBoard;
@@ -20,13 +20,16 @@ public class HostModel extends PlayerModel implements Observer<HostServer> {
     private static HostModel hostModel;
     //methods
 
-    public void addNewPlayer(Socket socket){
-        i
+    public void addNewPlayer(Socket socket) {
+        return;
     }
 
 
-    public static HostModel getHost(){
-        return null;
+    public static HostModel getHost() {
+        if (hostModel == null) {
+            hostModel = new HostModel();
+        }
+        return hostModel;
     }
     private void completeTiles(Player player, int numOfTiles){}
 
@@ -56,8 +59,8 @@ public class HostModel extends PlayerModel implements Observer<HostServer> {
     }
 
     @Override
-    public char[][] getBoardStatus() {
-        return new char[0][];
+    public Tile[][] getBoardStatus() {
+        return new Tile[0][];
     }
 
     @Override
@@ -88,5 +91,8 @@ public class HostModel extends PlayerModel implements Observer<HostServer> {
     @Override
     public void update(Observable o, Object arg) {
 
+    }
+    public Socket GetSocketMyServer(){
+        return hostModel.GetSocketMyServer();
     }
 }
