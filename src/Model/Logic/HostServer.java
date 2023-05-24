@@ -17,7 +17,7 @@ public class HostServer extends Observable {
     private ClientHandler clientHandler;
     private HashMap<Integer, Socket> clientsMap;
 
-    private List<File> listBooks;
+    private List<File> listBooks; ////
 
 
     /**
