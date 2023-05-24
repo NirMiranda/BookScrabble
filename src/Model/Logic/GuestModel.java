@@ -37,9 +37,9 @@ public class GuestModel extends PlayerModel implements Observer {
         clientCommunication.send(myPlayer.id, "tryPlaceWord",word, String.valueOf(row), String.valueOf(col), String.valueOf(isVertical));
     }
 
-    public void placeTile(Tile tile,int row,int col){
-        clientCommunication.send(myPlayer.id,"placeTile",String.valueOf(tile.letter),String.valueOf(row),String.valueOf(col));
-    }//
+//    public void placeTile(Tile tile,int row,int col){
+//        clientCommunication.send(myPlayer.id,"placeTile",String.valueOf(tile.letter),String.valueOf(row),String.valueOf(col));
+//    }//
 
     @Override
     public void takeTileFromBag() {
@@ -116,6 +116,7 @@ public class GuestModel extends PlayerModel implements Observer {
      * @param arg   an argument passed to the {@code notifyObservers}
      *                 method. - a string of the form - id; method name; different arguments
      */
+    //protocol- "id;method;arg1,arg2,arg3.."
     @Override
     public void update(Observable o, Object arg) {
         if (arg instanceof String) {
@@ -141,17 +142,16 @@ public class GuestModel extends PlayerModel implements Observer {
                     setNumberOfTilesInBag(numberOfTiles);
                     break;
                 case "setCurrentPlayerId":
-                    int currentPlayerId = Integer.parseInt(args);
-                    setCurrentPlayerId(currentPlayerId);
+                    setCurrentPlayerId(Integer.parseInt(args));
                     break;
-                case "setPlayersScores":
+                case "setPlayersScoressetPlayersScores":
                     HashMap<Integer, Integer> scores = parsePlayersScores(args);
                     setPlayersScores(scores);
                     break;
                 case "setPlayersNumberOfTiles":
                     HashMap<Integer, String> numberOfTilesMap = parsePlayersNumberOfTiles(args);
                     setPlayersNumberOfTiles(numberOfTilesMap);
-                case "connect":
+                case "addNewPlayer":
                     int connectedPlayerId = Integer.parseInt(args);
                     int connectedPlayerScore = 0; // Set the initial score to 0
                     playersScores.put(connectedPlayerId, connectedPlayerScore);
@@ -160,10 +160,10 @@ public class GuestModel extends PlayerModel implements Observer {
                     playersScores.remove(disconnectedPlayerId);
                 case "setPlayers" :
                     setPlayers(args);
-                case "placedTile":
-                    myBoard = parseBoardStatus(args);
-                case "undo":
-                    myBoard = parseBoardStatus(args);
+//                case "placedTile":
+//                    myBoard = parseBoardStatus(args);
+//                case "undo":
+//                    myBoard = parseBoardStatus(args);
 
                     break;
                 default:
@@ -298,5 +298,8 @@ public class GuestModel extends PlayerModel implements Observer {
         try {
             this.clientCommunication.socket.close();
         } catch (IOException e) { throw new RuntimeException(e);}
+    }
+    private void undo(){
+
     }
 }
