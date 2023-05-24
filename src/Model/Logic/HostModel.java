@@ -16,6 +16,7 @@ public class HostModel extends PlayerModel implements Observer<HostServer> {
     private Board board;
     private Tile[][] prevBoard;
     private Tile.Bag bag;
+    int currentPlayerId;
 
     private static HostModel hostModel;
     //methods
@@ -31,7 +32,9 @@ public class HostModel extends PlayerModel implements Observer<HostServer> {
         }
         return hostModel;
     }
-    private void completeTiles(Player player, int numOfTiles){}
+    private void completeTiles(Player player, int numOfTiles){
+
+    }
 
     @Override
     public void tryPlaceWord(String word, int col, int row, boolean isVertical) {
@@ -95,4 +98,40 @@ public class HostModel extends PlayerModel implements Observer<HostServer> {
     public Socket GetSocketMyServer(){
         return hostModel.GetSocketMyServer();
     }
+
+    private void setCurrentPlayerId(){
+        this.currentPlayerId=(this.currentPlayerId+1)%4;
+    }
+    private void setPlayersScores(){
+
+    }
+    private void setPlayersNumberOfTiles(){
+
+    }
+    private void setNumberOfTilesInBag(){
+
+    }
+    private void startGame(){
+
+    }
+    private void endGame(){
+
+    }
+    private void disconnect(){
+
+    }
+    private void undo(){
+
+    }
+    private void dealRandomTile(){
+
+    }
+    private void setGameOrder(){
+
+    }
+    private void dealTiles(){
+
+    }
+
+
 }
