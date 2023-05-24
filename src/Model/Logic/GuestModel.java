@@ -39,7 +39,7 @@ public class GuestModel extends PlayerModel implements Observer {
 
     public void placeTile(Tile tile,int row,int col){
         clientCommunication.send(myPlayer.id,"placeTile",String.valueOf(tile.letter),String.valueOf(row),String.valueOf(col));
-    }
+    }//
 
     @Override
     public void takeTileFromBag() {
