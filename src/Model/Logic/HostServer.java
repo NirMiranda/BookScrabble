@@ -13,7 +13,7 @@ public class HostServer extends Observable {
 
     private String myServerIP;
     private volatile boolean stop;
-
+    private ClientHandler clientHandler;
     private HashMap<Integer, Socket> clientsMap;
 
     private List<String> listBooks;
