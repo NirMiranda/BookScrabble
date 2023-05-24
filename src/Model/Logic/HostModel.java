@@ -56,8 +56,8 @@ public class HostModel extends PlayerModel implements Observer<HostServer> {
     }
 
     @Override
-    public Tile[][] getBoardStatus() {
-        return new Tile[0][];
+    public char[][] getBoardStatus() {
+        return new char[0][];
     }
 
     @Override

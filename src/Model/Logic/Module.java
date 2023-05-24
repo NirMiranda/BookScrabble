@@ -15,7 +15,7 @@ public interface Module {
 
     public void setBoardStatus(Tile[][] board);
 
-    public Tile[][] getBoardStatus();
+    public char[][] getBoardStatus();
     public int getNumberOfTilesInBag();
     public int getCurrentPlayerId();
     public HashMap<Integer,Integer> getPlayersScores();
