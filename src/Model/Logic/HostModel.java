@@ -21,8 +21,9 @@ public class HostModel extends PlayerModel implements Observer<HostServer> {
     //methods
 
     public void addNewPlayer(Socket socket){
-
+        i
     }
+
 
     public static HostModel getHost(){
         return null;
