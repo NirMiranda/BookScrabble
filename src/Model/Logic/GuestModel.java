@@ -14,6 +14,7 @@ public class GuestModel extends PlayerModel implements Observer {
     private HashMap<Integer, Integer> playersScores;
     private HashMap<Integer, String> playersNumberOfTiles; //may change to <Integer,Integer>
     private char[][] myBoard = new char[15][15];
+    boolean isMyTurn = false;
 
     /**
      * @param clientCommunication connects between the guest to the host server
@@ -67,41 +68,61 @@ public class GuestModel extends PlayerModel implements Observer {
     }
 
 
-    /**
-     *
-     * @param board the current board represented as an char[][]
-     */
-    public void setBoardStatus(char[][] board) {
-        this.boardStatus = board;
-    }
-
     @Override
     public char[][] getBoardStatus() {
         clientCommunication.send(myPlayer.id, "getBoardStatus");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return myBoard;
     }
 
     @Override
     public int getNumberOfTilesInBag() {
         clientCommunication.send(myPlayer.id, "getNumberOfTilesInBag");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return numberOfTilesInBag;
     }
 
     @Override
     public int getCurrentPlayerId() {
         clientCommunication.send(myPlayer.id, "getCurrentPlayerId");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if(currentPlayerId == myPlayer.id){
+            isMyTurn =true;
+        }
         return currentPlayerId;
     }
 
-    @Override
-    public HashMap<Integer, Integer> getPlayersScores() {
-        clientCommunication.send(myPlayer.id, "getPlayersScores");
-        return playersScores;
-    }
+//    @Override
+//    public HashMap<Integer, Integer> getPlayersScores() {
+//        clientCommunication.send(myPlayer.id, "getPlayersScores");
+//        try {
+//            Thread.sleep(100);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return playersScores;
+//    }
 
     @Override
     public HashMap<Integer, String> getPlayersNumberOfTiles() {
         clientCommunication.send(myPlayer.id, "getPlayersNumberOfTiles");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return playersNumberOfTiles;
     }
 
@@ -156,10 +177,9 @@ public class GuestModel extends PlayerModel implements Observer {
                     int connectedPlayerScore = 0; // Set the initial score to 0
                     playersScores.put(connectedPlayerId, connectedPlayerScore);
                 case "disconnect":
-                    int disconnectedPlayerId = Integer.parseInt(args);
-                    playersScores.remove(disconnectedPlayerId);
-                case "setPlayers" :
-                    setPlayers(args);
+                    playersScores.remove(Integer.parseInt(args));//delete from the players map
+                case  "passTurn":
+                    turnPassed();
 //                case "placedTile":
 //                    myBoard = parseBoardStatus(args);
 //                case "undo":
@@ -173,14 +193,11 @@ public class GuestModel extends PlayerModel implements Observer {
         }
     }
 
-    // Helper methods for parsing the responses
-    public HashMap<Integer,Integer> setPlayers (String response){
-        String[] parts =response.split(",");
-        for (String player:parts){
-            this.playersScores.put(Integer.valueOf(player.charAt(0)),0);
-        }
-        return this.playersScores;
+    private void turnPassed() {
+        currentPlayerId = (currentPlayerId+1)%4;
     }
+
+    // Helper methods for parsing the responses
 
 
 
@@ -271,12 +288,6 @@ public class GuestModel extends PlayerModel implements Observer {
     }
 
 
-
-    //refillHand may not be used and will be only in the host model
-    public void refillHand (int numberOfTiles){
-        clientCommunication.send(myPlayer.id, "refillHand",String.valueOf(numberOfTiles));
-    }
-
     private void leaveGame(){
         clientCommunication.send(myPlayer.id,"leaveGame");
         try {
@@ -284,7 +295,6 @@ public class GuestModel extends PlayerModel implements Observer {
         } catch (IOException e) { throw new RuntimeException(e);}
     }
     private void handleStartGame() {
-        getPlayersScores();
         getBoardStatus();
         getCurrentPlayerId();
         getCurrentPlayerId();
@@ -294,7 +304,6 @@ public class GuestModel extends PlayerModel implements Observer {
 
     private void handleEndGame() {
         getBoardStatus();
-        getPlayersScores();
         try {
             this.clientCommunication.socket.close();
         } catch (IOException e) { throw new RuntimeException(e);}
