@@ -8,13 +8,14 @@ import java.util.*;
 
 public class GuestModel extends PlayerModel implements Observer {
     private ClientCommunication clientCommunication;
-    private char[][] boardStatus;
     private int numberOfTilesInBag;
-    private int currentPlayerId;
-    private HashMap<Integer, Integer> playersScores;
-    private HashMap<Integer, String> playersNumberOfTiles; //may change to <Integer,Integer>
+    private int currentPlayerIndex;
+    private HashMap<Integer, Integer> playersScores = new HashMap<>();
+    private HashMap<Integer, Player> playersConnected = new HashMap<>(); // may not be needed
+    private HashMap<Integer, String> playersNumberOfTiles;
     private char[][] myBoard = new char[15][15];
     boolean isMyTurn = false;
+    private List<Integer> turnsOrder = new ArrayList<>();
 
     /**
      * @param clientCommunication connects between the guest to the host server
@@ -37,16 +38,6 @@ public class GuestModel extends PlayerModel implements Observer {
     public void tryPlaceWord(String word, int col, int row, boolean isVertical) {
         clientCommunication.send(myPlayer.id, "tryPlaceWord",word, String.valueOf(row), String.valueOf(col), String.valueOf(isVertical));
     }
-
-//    public void placeTile(Tile tile,int row,int col){
-//        clientCommunication.send(myPlayer.id,"placeTile",String.valueOf(tile.letter),String.valueOf(row),String.valueOf(col));
-//    }//
-
-    @Override
-    public void takeTileFromBag() {
-        clientCommunication.send(myPlayer.id, "takeTileFromBag");
-    }
-
 
     @Override
     public void passTurn() {
@@ -89,31 +80,35 @@ public class GuestModel extends PlayerModel implements Observer {
         }
         return numberOfTilesInBag;
     }
+    private void getTurnsOrder(){
+        clientCommunication.send(myPlayer.id,"getTurnsOrder");
+    }
+
 
     @Override
-    public int getCurrentPlayerId() {
+    public int getCurrentPlayerIndex() {
         clientCommunication.send(myPlayer.id, "getCurrentPlayerId");
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        if(currentPlayerId == myPlayer.id){
+        if(turnsOrder.get(currentPlayerIndex) == myPlayer.id){
             isMyTurn =true;
         }
-        return currentPlayerId;
+        return currentPlayerIndex;
     }
 
-//    @Override
-//    public HashMap<Integer, Integer> getPlayersScores() {
-//        clientCommunication.send(myPlayer.id, "getPlayersScores");
-//        try {
-//            Thread.sleep(100);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return playersScores;
-//    }
+
+    public HashMap<Integer, Integer> getPlayersScores() {
+        clientCommunication.send(myPlayer.id, "getPlayersScores");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return playersScores;
+    }
 
     @Override
     public HashMap<Integer, String> getPlayersNumberOfTiles() {
@@ -162,10 +157,10 @@ public class GuestModel extends PlayerModel implements Observer {
                     int numberOfTiles = Integer.parseInt(args);
                     setNumberOfTilesInBag(numberOfTiles);
                     break;
-                case "setCurrentPlayerId":
-                    setCurrentPlayerId(Integer.parseInt(args));
+                case "setCurrentPlayerIndex":
+                    setCurrentPlayerIndex(Integer.parseInt(args));
                     break;
-                case "setPlayersScoressetPlayersScores":
+                case "setPlayersScoresScores":
                     HashMap<Integer, Integer> scores = parsePlayersScores(args);
                     setPlayersScores(scores);
                     break;
@@ -176,12 +171,12 @@ public class GuestModel extends PlayerModel implements Observer {
                     int connectedPlayerId = Integer.parseInt(args);
                     int connectedPlayerScore = 0; // Set the initial score to 0
                     playersScores.put(connectedPlayerId, connectedPlayerScore);
+                case "setGameOrder":
+                    setGameOrder(args);
                 case "disconnect":
-                    playersScores.remove(Integer.parseInt(args));//delete from the players map
+                    updatePlayerLeft(args);
                 case  "passTurn":
                     turnPassed();
-//                case "placedTile":
-//                    myBoard = parseBoardStatus(args);
 //                case "undo":
 //                    myBoard = parseBoardStatus(args);
 
@@ -193,8 +188,24 @@ public class GuestModel extends PlayerModel implements Observer {
         }
     }
 
+    private void updatePlayerLeft(String args) {
+        playersScores.remove(Integer.parseInt(args));//delete from the players map
+        turnsOrder.remove(Integer.parseInt(args));
+    }
+
+    private void setGameOrder(String response) {
+        String[] playersTurn = response.split(",");
+
+        for (String pair : playersTurn) {
+            String[] keyValue = pair.split(":");
+            int playerId = Integer.parseInt(keyValue[0]);
+            int turn = Integer.parseInt(keyValue[1]);
+            turnsOrder.add(turn,playerId);
+        }
+    }
+
     private void turnPassed() {
-        currentPlayerId = (currentPlayerId+1)%4;
+        currentPlayerIndex = (currentPlayerIndex+1)%turnsOrder.size();
     }
 
     // Helper methods for parsing the responses
@@ -243,6 +254,7 @@ public class GuestModel extends PlayerModel implements Observer {
             String[] keyValue = pair.split(":");
             int playerId = Integer.parseInt(keyValue[0]);
             int score = Integer.parseInt(keyValue[1]);
+            playersConnected.get(playerId).score=score;
             playersScores.put(playerId, score);
         }
 
@@ -275,8 +287,8 @@ public class GuestModel extends PlayerModel implements Observer {
         this.numberOfTilesInBag = numberOfTiles;
     }
 
-    private void setCurrentPlayerId(int currentPlayerId) {
-        this.currentPlayerId = currentPlayerId;
+    private void setCurrentPlayerIndex(int currentPlayerIndex) {
+        this.currentPlayerIndex = currentPlayerIndex;
     }
 
     private void setPlayersScores(HashMap<Integer, Integer> playersScores) {
@@ -296,9 +308,8 @@ public class GuestModel extends PlayerModel implements Observer {
     }
     private void handleStartGame() {
         getBoardStatus();
-        getCurrentPlayerId();
-        getCurrentPlayerId();
-        getPlayersNumberOfTiles();
+        getTurnsOrder();
+        getCurrentPlayerIndex();
         getMyTiles();
     }
 

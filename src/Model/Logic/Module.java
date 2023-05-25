@@ -9,7 +9,6 @@ import java.util.List;
 //this is the interface extenders -> host/guest model.
 public interface Module {
     public void tryPlaceWord(String word, int col,int row, boolean isVertical);
-    public void takeTileFromBag();
     public void passTurn();
     public void challenge(String word);
 
@@ -17,8 +16,8 @@ public interface Module {
 
     public char[][] getBoardStatus();
     public int getNumberOfTilesInBag();
-    public int getCurrentPlayerId();
-//    public HashMap<Integer,Integer> getPlayersScores();
+    public int getCurrentPlayerIndex();
+
     public HashMap<Integer,String> getPlayersNumberOfTiles();
     public List<Tile> getMyTiles();
 

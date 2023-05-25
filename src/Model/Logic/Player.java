@@ -10,6 +10,13 @@ public class Player {
     int score;
     List<Tile> tiles;
 
+    public Player(int id, String name, int score, List<Tile> tiles) {
+        this.id = id;
+        this.name = name;
+        this.score = score;
+        this.tiles = tiles;
+    }
+
     public int getId() {
         return 0;
     }
