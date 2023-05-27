@@ -12,8 +12,6 @@ public interface Module {
     public void passTurn();
     public void challenge(String word);
 
-    public void setBoardStatus(Tile[][] board);
-
     public char[][] getBoardStatus();
     public int getNumberOfTilesInBag();
     public int getCurrentPlayerIndex();

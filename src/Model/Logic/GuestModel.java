@@ -13,7 +13,7 @@ public class GuestModel extends PlayerModel implements Observer {
     private HashMap<Integer, Integer> playersScores = new HashMap<>();
     private HashMap<Integer, Player> playersConnected = new HashMap<>(); // may not be needed
     private HashMap<Integer, String> playersNumberOfTiles;
-    private char[][] myBoard = new char[15][15];
+    private char[][] myBoard =new char[15][15];
     boolean isMyTurn = false;
     private List<Integer> turnsOrder = new ArrayList<>();
 
@@ -22,8 +22,10 @@ public class GuestModel extends PlayerModel implements Observer {
      */
 
     public GuestModel(ClientCommunication clientCommunication) {
-        this.clientCommunication = clientCommunication;
+        this.clientCommunication =  clientCommunication;
         clientCommunication.addObserver(this);
+        clientCommunication.send(-1, "playerConnected");
+
     }
 
     /**
@@ -54,70 +56,34 @@ public class GuestModel extends PlayerModel implements Observer {
     }
 
     @Override
-    public void setBoardStatus(Tile[][] board) { //may be a problem
-        return;
-    }
-
-
-    @Override
     public char[][] getBoardStatus() {
-        clientCommunication.send(myPlayer.id, "getBoardStatus");
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
         return myBoard;
     }
 
     @Override
     public int getNumberOfTilesInBag() {
-        clientCommunication.send(myPlayer.id, "getNumberOfTilesInBag");
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return numberOfTilesInBag;
     }
-    private void getTurnsOrder(){
-        clientCommunication.send(myPlayer.id,"getTurnsOrder");
+    public List<Integer> getTurnsOrder(){
+//        clientCommunication.send(myPlayer.id,"getTurnsOrder");
+        return turnsOrder;
+
     }
 
 
     @Override
     public int getCurrentPlayerIndex() {
-        clientCommunication.send(myPlayer.id, "getCurrentPlayerId");
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        if(turnsOrder.get(currentPlayerIndex) == myPlayer.id){
-            isMyTurn =true;
-        }
         return currentPlayerIndex;
     }
 
 
     public HashMap<Integer, Integer> getPlayersScores() {
-        clientCommunication.send(myPlayer.id, "getPlayersScores");
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return playersScores;
     }
 
     @Override
     public HashMap<Integer, String> getPlayersNumberOfTiles() {
-        clientCommunication.send(myPlayer.id, "getPlayersNumberOfTiles");
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return playersNumberOfTiles;
     }
 
@@ -160,32 +126,43 @@ public class GuestModel extends PlayerModel implements Observer {
                 case "setCurrentPlayerIndex":
                     setCurrentPlayerIndex(Integer.parseInt(args));
                     break;
-                case "setPlayersScoresScores":
+                case "setPlayersScores":
                     HashMap<Integer, Integer> scores = parsePlayersScores(args);
                     setPlayersScores(scores);
                     break;
                 case "setPlayersNumberOfTiles":
                     HashMap<Integer, String> numberOfTilesMap = parsePlayersNumberOfTiles(args);
                     setPlayersNumberOfTiles(numberOfTilesMap);
+                    break;
                 case "addNewPlayer":
                     int connectedPlayerId = Integer.parseInt(args);
                     int connectedPlayerScore = 0; // Set the initial score to 0
                     playersScores.put(connectedPlayerId, connectedPlayerScore);
+                    break;
                 case "setGameOrder":
                     setGameOrder(args);
+                    break;
                 case "disconnect":
                     updatePlayerLeft(args);
+                    break;
                 case  "passTurn":
                     turnPassed();
+                    break;
 //                case "undo":
 //                    myBoard = parseBoardStatus(args);
-
+                case "tryPlaceWord":
+                    wrongWordHandler();
                     break;
                 default:
                     System.out.println("Unknown method name: " + methodName);
                     break;
             }
         }
+    }
+
+    private void wrongWordHandler() {
+        System.out.println("Wrong word, try again\n You may challenge the decision\n" +
+                " Successful challenge = +10 points\n Unsuccessful challenge = -10 points ");
     }
 
     private void updatePlayerLeft(String args) {
@@ -220,6 +197,7 @@ public class GuestModel extends PlayerModel implements Observer {
      */
 
     private char[][] parseBoardStatus(String response) {
+
         String[] tiles = response.split(",");
 
         for (String tile : tiles) {
@@ -254,7 +232,7 @@ public class GuestModel extends PlayerModel implements Observer {
             String[] keyValue = pair.split(":");
             int playerId = Integer.parseInt(keyValue[0]);
             int score = Integer.parseInt(keyValue[1]);
-            playersConnected.get(playerId).score=score;
+//            playersConnected.get(playerId).score=score;
             playersScores.put(playerId, score);
         }
 
@@ -289,6 +267,9 @@ public class GuestModel extends PlayerModel implements Observer {
 
     private void setCurrentPlayerIndex(int currentPlayerIndex) {
         this.currentPlayerIndex = currentPlayerIndex;
+        if(turnsOrder.get(currentPlayerIndex) == myPlayer.id) {
+            isMyTurn = true;
+        }
     }
 
     private void setPlayersScores(HashMap<Integer, Integer> playersScores) {
@@ -306,7 +287,7 @@ public class GuestModel extends PlayerModel implements Observer {
             this.clientCommunication.socket.close();
         } catch (IOException e) { throw new RuntimeException(e);}
     }
-    private void handleStartGame() {
+    private void handleStartGame() { //may not be needed since host model updates everything he does.
         getBoardStatus();
         getTurnsOrder();
         getCurrentPlayerIndex();
@@ -319,7 +300,7 @@ public class GuestModel extends PlayerModel implements Observer {
             this.clientCommunication.socket.close();
         } catch (IOException e) { throw new RuntimeException(e);}
     }
-    private void undo(){
-
-    }
+//    private void undo(){
+//
+//    }
 }
