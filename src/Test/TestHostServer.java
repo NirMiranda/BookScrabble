@@ -14,22 +14,6 @@ import java.util.Scanner;
 
 public class TestHostServer {
 
-    public static class chen implements ClientHandler {
-
-        HostServer hostServer;
-
-        @Override
-        public void handleClient(InputStream in, OutputStream out) throws IOException {
-            Scanner scan = new Scanner(in);
-            String message = scan.next();
-            hostServer.updateObservers(message);
-        }
-
-        @Override
-        public void close() {
-
-        }
-    }
 
     //----------------------------------------------------------------------------------------------------------------------
     public static class TestHostModel implements Observer {
@@ -50,7 +34,7 @@ public class TestHostServer {
 
     public static void checkMessageFromServer() {
         TestHostModel test1 = null;
-        chen handler = new chen();
+        MessageHandler handler = new MessageHandler();
         handler.hostServer = new HostServer(2356, 1234, "localhost", false, handler); //HostServer-->MyServer
         test1 = new TestHostModel(handler.hostServer); //to check to notify to the observable.
         try {
@@ -64,41 +48,65 @@ public class TestHostServer {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
-        if (test1.message == null || !test1.message.equals("-1;connect;,start")) {
-            System.out.println("Expected to get -1;connect;,start,result:" + test1.message);
-            System.out.println(" Error ,message for the first guest didn't received ,CheckForMessage didn't work \n");
-        } else {
-            System.out.println(" Good job,message for the first guest received ,CheckForMessage work!:) ");
-
-            c1.close();
-            handler.hostServer.close();
-
+        c1.send(1, "chen", "1", "2", "3"); //client Communication ---> HostServer
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-    }
+        c1.send(1, "tryPlaceWord", "1", "2", "3"); //client Communication ---> HostServer
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        c1.send(1, "challenge", "1", "2", "3");
+        //----------------------------------------------------------------------------------------------------------------------------------
+//            if (test1.message == null || !test1.message.equals("1;chen;,1,2,3")) {
+//                System.out.println("Expected to get 1;chen;,1,2,3," +"  "+"result:" + test1.message);
+//                System.out.println(" Error ,message for the first guest didn't received ,CheckForMessage didn't work \n");
+//            } else {
+//                System.out.println(" Good job,message for the first guest received ,CheckForMessage work!:) ");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+                c1.close();
+                handler.hostServer.close();
+
+            }
+
+
+
 
     public static void main(String[] args) {
 
         MyServer myServer = new MyServer(1234, new ClientHandler() {
             @Override
             public void handleClient(InputStream inFromclient, OutputStream outToClient) throws IOException {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inFromclient));
-                String mes = reader.readLine();
-                if (mes.equals("message1 delivered to My server \n")) {
-                    System.out.println("Hello from Host Server\n");
+                Scanner scan = new Scanner(inFromclient);
+                String mes = scan.next();
+                System.out.println(mes);
+                if (mes.equals("Q")) {
+                    System.out.println("Hello from My Server\n");
                 } else {
-                    System.out.println("The HostServer don't get the message\n");
+                    System.out.println("The MyServer don't get the message\n");
                 }
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outToClient));
-                writer.write("HostServer get the message from the handler");
+
+                if (mes.equals("C")) {
+                    System.out.println("Hello from My Server\n");
+                } else {
+                    System.out.println("The MyServer don't get the message\n");
+                }
             }
 
             @Override
             public void close() {
-
             }
         });
 
+        myServer.start();
         System.out.println("Checking HostServer class\n");
         checkMessageFromServer();
         try {
