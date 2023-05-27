@@ -12,24 +12,30 @@ import java.util.stream.Collectors;
 
 public class HostModel extends PlayerModel implements Observer {
     private HashMap<Integer, Player> connectedPlayers;
-    private HostServer hostServer;
+    private HashMap<Integer, String> playersNumberOfTiles = new HashMap<>();
+    private static HostServer hostServer;
     private Board board;
     private Tile[][] prevBoard;
     private Tile.Bag bag;
     public int currentPlayerIndex;
     //    public HashMap<Integer,Integer> turnsMap; // Map from index to ID
     private List<Player> turnsOrder;
+    boolean isMyTurn = false;
 
 
     public HashMap<Integer,Integer> playersScores;
 
-    public HostModel() {
+    public HostModel(HostServer hostServer) { //when the game is started
         this.connectedPlayers = new HashMap<>();
+        myPlayer.id=0;
+        connectedPlayers.put(0,myPlayer);
         this.board = new Board();
         this.prevBoard = this.board.getTile();
         this.bag = Tile.Bag.getBag();
 //        this.turnsMap=new HashMap<>();
         this.playersScores=new HashMap<>();
+        turnsOrder = new ArrayList<>();
+
     }
 
     private static HostModel hostModel;
@@ -45,39 +51,68 @@ public class HostModel extends PlayerModel implements Observer {
         }
     }
     public int idGenerator(){
-        myPlayer.id=0;
         return connectedPlayers.size()+1;
     }
 
     public static HostModel getHost() {
         if (hostModel == null) {
-            hostModel = new HostModel();
+            hostModel = new HostModel(hostServer);
         }
         return hostModel;
     }
 
     @Override
     public void tryPlaceWord(String word, int col, int row, boolean isVertical) {
-
+        StringBuilder sb = new StringBuilder();
+        Socket myServer = hostServer.sendToMyServer("Q", word);
+        Scanner scan = null;
+        try {
+            scan = new Scanner(myServer.getOutputStream().toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Boolean answerFromServer = Boolean.getBoolean(scan.next());
+        sb.append(word).append(",").append(row).append(",").append(col).append(isVertical).append(answerFromServer);
+        if(answerFromServer){
+            wordIsValid(sb.toString(), myPlayer.id);
+        }
     }
 
     @Override
     public void passTurn() {
         this.currentPlayerIndex = (this.currentPlayerIndex+1)%connectedPlayers.size();
-        hostServer.updateAllClient(myPlayer.id+";"+"passTurn");
+        hostServer.updateAllClient(myPlayer.id+";"+"passTurn;"+currentPlayerIndex);
+        if(myPlayer.id==turnsOrder.get(currentPlayerIndex).id){
+            isMyTurn =true;
+        }
     }
 
     @Override
     public void challenge(String word) {
-
+        Socket myServer = hostServer.sendToMyServer("C", word);
+        Scanner scan = null;
+        try {
+            scan = new Scanner(myServer.getOutputStream().toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Boolean answerFromServer = Boolean.getBoolean(scan.next());
+        if(answerFromServer){
+            this.playersScores.replace(myPlayer.id,playersScores.get(myPlayer.id)+10);//challenge success = +10 points
+        }
+        else this.playersScores.replace(myPlayer.id,playersScores.get(myPlayer.id)-10);//challenge fail = -10 points
     }
 
-    @Override
     public void setBoardStatus(Tile[][] board) {
-
+        prevBoard = this.board.getTile();
+        for(int i=0;i<15;i++ ){
+            for (int j=0;j<15;j++){
+                this.board.getTile()[i][j] = board[i][j];
+            }
+        }
     }
     public char[][] getBoardStatus(){
-        return new char[0][];
+        return parseBoardStatusToChar(boardParser(this.board));
     }
 
     @Override
@@ -87,21 +122,24 @@ public class HostModel extends PlayerModel implements Observer {
 
     @Override
     public int getCurrentPlayerIndex() {
-        hostServer.updateAllClient(myPlayer.id + ";" + "setCurrentPlayerIndex" + currentPlayerIndex);
         return currentPlayerIndex;
     }
     public HashMap<Integer, Integer> getPlayersScores() {
-        return null;
+        return this.playersScores;
     }
 
     @Override
     public HashMap<Integer, String> getPlayersNumberOfTiles() {
-        return null;
+        return playersNumberOfTiles;
     }
 
     @Override
     public List<Tile> getMyTiles() {
         return myPlayer.getTiles();
+    }
+    private void setPlayersNumberOfTiles(){
+        for(Integer id:this.connectedPlayers.keySet())
+        this.playersNumberOfTiles.put(id,String.valueOf(connectedPlayers.get(id).tiles.size()));
     }
 
     @Override
@@ -114,19 +152,37 @@ public class HostModel extends PlayerModel implements Observer {
         switch (methodName){
             case "passTurn":
                 passTurn();
+                break;
             case "getBoardStatus":
                 boardParser(board);
+                break;
             case "getNumberOfTilesInBag":
                 setNumberOfTilesInBag();
+                break;
             case "getCurrentPlayerIndex":
                 getCurrentPlayerIndex();
+                break;
             case "leaveGame":
                 disconnectGuest(id);
+                break;
             case "tryPlaceWord":
                 wordIsValid(args,id);
+                break;
             case "playerConnected" :
                 addNewPlayer(hostServer.clientsMap.get(id));
+                break;
+            case "challenge":
+                challengeScoreUpdate(id,args);
         }
+    }
+
+    private void challengeScoreUpdate(int id,String response) {
+        String[] args = response.split(",");
+        if (args[args.length - 1].equals("true")) {
+            this.playersScores.replace(id, playersScores.get(id) + 10);//successful challenge
+        }
+        else this.playersScores.replace(id, playersScores.get(id) + 10);//unsuccessful challenge
+        hostServer.updateAllClient(scoreParser(playersScores));
     }
 
     private String boardParser(Board board) {
@@ -148,7 +204,6 @@ public class HostModel extends PlayerModel implements Observer {
         sb.append(myPlayer.id).append(";setScoresStatus;");
         for(Integer id:playersScores.keySet()){
             sb.append(id).append(":").append(playersScores.get(id)).append(",");
-
         }
 
         sb.deleteCharAt(sb.length()-1);
@@ -162,18 +217,10 @@ public class HostModel extends PlayerModel implements Observer {
     private void setCurrentPlayerIndex(){
         this.currentPlayerIndex=(this.currentPlayerIndex+1)%connectedPlayers.size();
     }
-    private void setPlayersScores(){
 
-    }
-    private void setPlayersNumberOfTiles(){
-
-    }
     private void setNumberOfTilesInBag(){
         String numberOfTilesInBag = String.valueOf(bag.getQuantities());
         hostServer.updateAllClient(myPlayer.id + ";" + "setNumberOfTilesInBag" + numberOfTilesInBag);
-    }
-    private void startGame(){
-
     }
     private void endGame(){
         this.hostServer.updateAllClient(myPlayer.id + ";endGame");
@@ -227,31 +274,45 @@ public class HostModel extends PlayerModel implements Observer {
         }
 
     }
+    public void startGame(){
+        if(this.connectedPlayers.size()==4)
+        setGameOrder();
+        hostServer.updateAllClient(boardParser(board));
+        hostServer.updateAllClient(scoreParser(playersScores));
+        hostServer.updateAllClient(myPlayer.id + ";setCurrentPlayerIndex;" + currentPlayerIndex);
+        hostServer.updateAllClient(myPlayer.id + ";setNumberOfTilesInBag;" +bag.getQuantities());
+    }
+
     public void wordIsValid(String response, int id) {
         String[] args = response.split(",");
         if (args[args.length - 1].equals("true")) {
             String myWord = args[0];
-            int row=Integer.parseInt(args[1]);
-            int col=Integer.parseInt(args[2]);
-            Boolean isVert=Boolean.parseBoolean(args[3]);
-            List<Tile> t=new ArrayList<>();
-            for(char c:myWord.toCharArray()){
+            int row = Integer.parseInt(args[1]);
+            int col = Integer.parseInt(args[2]);
+            Boolean isVert = Boolean.parseBoolean(args[3]);
+            List<Tile> t = new ArrayList<>();
+            for (char c : myWord.toCharArray()) {
                 t.add(Tile.Bag.getBag().getTile(c));
             }
-            Word w = new Word((Tile[])t.toArray(),row,col,isVert);
-            int score=board.tryPlaceWord(w);
-            if(score>0){
-                connectedPlayers.get(id).score+=score;
+            Word w = new Word((Tile[]) t.toArray(), row, col, isVert);
+            int score = board.tryPlaceWord(w);
+            if (score > 0) {
+                connectedPlayers.get(id).score += score;
             }
-            removeTileFromHand(myWord,id);
-            fillHand(connectedPlayers.get(id));
-            playersScores.replace(id,playersScores.get(id)+score);
-
+            setBoardStatus(board.getTile());
+            removeTileFromHand(myWord, id);
+            if(bag.getSize()>0) {
+                fillHand(connectedPlayers.get(id));
+            }
+            else setPlayersNumberOfTiles();
+            playersScores.replace(id, playersScores.get(id) + score);
+            setCurrentPlayerIndex();
+            hostServer.updateAllClient(boardParser(board));
+            hostServer.updateAllClient(scoreParser(playersScores));
+            hostServer.updateAllClient(myPlayer.id + ";setCurrentPlayerIndex;" + currentPlayerIndex);
+            hostServer.updateAllClient(myPlayer.id + ";setNumberOfTilesInBag;" + bag.getQuantities());
         }
-        hostServer.updateAllClient(boardParser(board));
-        hostServer.updateAllClient(scoreParser(playersScores));
-        hostServer.updateAllClient(myPlayer.id + ";setCurrentPlayerIndex;" + currentPlayerIndex++);
-        hostServer.updateAllClient(myPlayer.id + ";setNumberOfTilesInBag;" +bag.getQuantities());
+        hostServer.sendToPlayerMessage(id,"tryPlaceWord","false");
     }
 
 
@@ -264,6 +325,26 @@ public class HostModel extends PlayerModel implements Observer {
         }
     }
 
+    private char[][] parseBoardStatusToChar(String response) {
+        char[][] myBoard = new char[15][15];
+        String[] tiles = response.split(",");
+
+        for (String tile : tiles) {
+            String[] tileParts = tile.split("=");
+
+            // Extract the tile position and value
+            String[] positionParts = tileParts[0].split(":");
+            int row = Integer.parseInt(positionParts[0]);
+            int col = Integer.parseInt(positionParts[1]);
+            char value = tileParts[1].charAt(0);
+
+            // Create a new Tile object with the value and add it to the board
+            myBoard[row][col] = value;
+
+        }
+
+        return myBoard;
+    }
 
 
 }
