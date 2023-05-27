@@ -3,6 +3,7 @@ package Model.Logic;
 import java.io.*;
 import java.net.Socket;
 import java.util.Observable;
+import java.util.Scanner;
 
 /**
  * This class is responsible for the communication between the client and the server.
@@ -25,12 +26,14 @@ public class ClientCommunication extends Observable {
     public ClientCommunication(String ip, int port){
         try{
             socket = new Socket(ip, port);
-            send(-1, "connect");
+            send(-1, "connect","start");
             startMessageCheckingThread();
         }catch (IOException e){
             throw new RuntimeException(e);
         }
+
     }
+
 
     private void startMessageCheckingThread() {
         Thread messageThread = new Thread(new Runnable() {
@@ -50,18 +53,19 @@ public class ClientCommunication extends Observable {
      */
 
     public void send(int id,String methodName, String...args){
-            try {
-                String message = updateMessage(id, methodName, args);
-                OutputStream outputStream = socket.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-                writer.write(message);
-                writer.newLine();
-                writer.flush();
-            } catch (IOException e) {
-                // Handle any exceptions that occur during the sending process
-                e.printStackTrace();
-            }
+        try {
+            String message = updateMessage(id, methodName, args);
+            OutputStream outputStream = socket.getOutputStream();
+            PrintWriter writer = new PrintWriter(outputStream);
+            writer.println(message);
+            writer.flush();
+        } catch (IOException e) {
+            // Handle any exceptions that occur during the sending process
+            e.printStackTrace();
         }
+
+    }
+
 
     /**
      *make the message in format: id;method;args1,args2...
@@ -99,23 +103,19 @@ public class ClientCommunication extends Observable {
     private void checkForMessage() {
         while (socket.isConnected() && !socket.isClosed()) {
             try {
-                InputStream inputStream = socket.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                String message;
-                if ((message = reader.readLine()) != null) {
+                Scanner in = new Scanner(socket.getInputStream());
+                if (in.hasNext()) {
+                    String message = in.nextLine();
                     setChanged();
                     notifyObservers(message);
                 }
-                Thread.sleep(250);//after 1/4 sec it will check again.
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+                Thread.sleep(250);
+            }catch(IOException|InterruptedException e){
                 throw new RuntimeException(e);
             }
         }
     }
 }
-
 
 
 

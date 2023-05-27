@@ -12,7 +12,7 @@ public class HostServer extends Observable {
     private int myServerPort;
     private String myServerIP;
     private volatile boolean stop;
-    private ClientHandler clientHandler;
+    public ClientHandler clientHandler;
     private HashMap<Integer, Socket> clientsMap;
     private List<File> listBooks;
 
@@ -28,44 +28,46 @@ public class HostServer extends Observable {
      *                      clientsMap --> to keep track of the connected clients in the HostServer class
      */
 
-    public HostServer(int hostPort, int myServerPort, String myServerIP, boolean stop) {
+    public HostServer(int hostPort, int myServerPort, String myServerIP, boolean stop,ClientHandler ch) {
         this.hostPort = hostPort;
         this.myServerPort = myServerPort;
         this.myServerIP = myServerIP;
         this.stop = false;
         this.clientsMap = new HashMap<>();
+        this.clientHandler=ch;
         this.start();
+    }
+
+    public void updateObservers(String message){
+        setChanged();
+        notifyObservers(message);
     }
 
 
     private void runServer() {
         ServerSocket server = null;
+        new Thread((this::checkForMessage)).start();
         try {
             server = new ServerSocket(hostPort);
             //need to be here new thread.
-            Thread clientThread = new Thread(this::checkForMessage);
-            clientThread.start();
+
             while (!stop) {
                 Socket client = server.accept();
-                HostModel.getHost().addNewPlayer(client);
+
+                this.clientsMap.put(1,client);
+                //HostModel.getHost().addNewPlayer(client);
                 // Handle the client connection in a separate thread
                 clientHandler.handleClient(client.getInputStream(), client.getOutputStream());
+
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
+            server.close();
         } catch (IOException e) {
-            System.err.println("Error occurred while running the server: " + e.getMessage());
-        } finally {
-            if (server != null) {
-                try {
-                    server.close();
-                } catch (IOException e) {
-                    System.err.println("Error occurred while closing the server socket: " + e.getMessage());
-                }
-            }
+            throw new RuntimeException(e);
         }
     }
 
@@ -76,18 +78,16 @@ public class HostServer extends Observable {
     private void checkForMessage() {
         // Assuming that the clientsMap contains the client sockets
         while (!stop) {
-            for (Socket clientSocket : clientsMap.values()) {
+            for (Socket clientSocket : this.clientsMap.values()) {
                 try {
                     // Check if there is any incoming message from the client
                     InputStream inputStream = clientSocket.getInputStream();
 
                     //The code checks if there is any incoming message from the client.If the value is greater than 0, it means there is an incoming message.
                     if (inputStream.available() > 0) {
-                        //Responsible for processing customer messages.
                         clientHandler.handleClient(inputStream, clientSocket.getOutputStream());
                     }
-                } catch (IOException e) {
-                }
+                } catch (IOException e) {}
             }
             try {
                 Thread.sleep(250); //Helps reduce CPU usage and allows you to perform other tasks.
@@ -147,26 +147,26 @@ public class HostServer extends Observable {
      * @param letter can be 'q'-query or 'c'-challenge
      * @param word   the word that the user wants to place
      */
-    public void sendToMyServer(String letter, String word) {
+    public Socket sendToMyServer(String letter, String word) {
         try {
             myServer = new Socket(myServerIP, myServerPort);
             PrintWriter myServerOut = new PrintWriter(myServer.getOutputStream());
             StringBuilder message = new StringBuilder();
             message.append(letter);
-            for (String book : listBooks) {
-                message.append(book + ",");
+            for (File book : listBooks) {
+                message.append(book.getName() + ",");
             }
             message.append(word);
-            myServerOut.print(message);
-            myServerOut.print("\n");
+            myServerOut.println(message);//send to MyServer the query from the HostModel.
             myServerOut.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return myServer;
     }
 
     /**
-     * This function is send a answer to the player.
+     * This function is send answer to the player.
      *
      * @param id     the id of the player
      * @param method the method that that has been sent to the server
@@ -194,8 +194,3 @@ public class HostServer extends Observable {
 
 
 }
-
-
-
-
-
