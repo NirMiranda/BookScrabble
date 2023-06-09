@@ -22,9 +22,11 @@ public class GuestModel extends PlayerModel implements Observer {
      */
 
     public GuestModel(ClientCommunication clientCommunication) {
-        this.clientCommunication =  clientCommunication;
+        this.clientCommunication = clientCommunication;
         clientCommunication.addObserver(this);
         clientCommunication.send(-1, "playerConnected");
+
+        this.playersNumberOfTiles = new HashMap<>(); // Initialize the HashMap here
 
     }
 
@@ -166,6 +168,7 @@ public class GuestModel extends PlayerModel implements Observer {
     }
 
     private void updatePlayerLeft(String args) {
+
         playersScores.remove(Integer.parseInt(args));//delete from the players map
         turnsOrder.remove(Integer.parseInt(args));
     }
