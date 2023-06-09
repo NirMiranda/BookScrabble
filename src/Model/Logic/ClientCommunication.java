@@ -84,12 +84,14 @@ public class ClientCommunication extends Observable {
     }
 
     public void close(){
+
         if(socket!=null){
             try {
+
                 socket.close();
                 // Notify observers that the connection has been closed
                 setChanged();
-                notifyObservers(0); // need to be integer if its string is make a problem.
+                notifyObservers("closed"); // need to be integer if its string is make a problem.
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

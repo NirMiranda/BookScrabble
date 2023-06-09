@@ -103,63 +103,68 @@ public class GuestModel extends PlayerModel implements Observer {
     //protocol- "id;method;arg1,arg2,arg3.."
     @Override
     public void update(Observable o, Object arg) {
-        if (arg instanceof String) {
-            String message = (String) arg;
-            String[] parts = message.split(";");
+   if (arg instanceof String) {
+       String message = (String) arg;
+       if (message.equals("closed")) {
+           close();
+       } else {
+           String[] parts = message.split(";");
 
-            int id = Integer.parseInt(parts[0]);
-            String methodName = parts[1];
-            String args = parts[2];
+           int id = Integer.parseInt(parts[0]);
+           String methodName = parts[1];
+           String args = parts[2];
 
-            switch (methodName) {
-                case "startGame":
-                    handleStartGame();
-                    break;
-                case "endGame":
-                    handleEndGame();
-                    break;
-                case "setBoardStatus":
-                    myBoard = parseBoardStatus(args);
-                    break;
-                case "setNumberOfTilesInBag":
-                    int numberOfTiles = Integer.parseInt(args);
-                    setNumberOfTilesInBag(numberOfTiles);
-                    break;
-                case "setCurrentPlayerIndex":
-                    setCurrentPlayerIndex(Integer.parseInt(args));
-                    break;
-                case "setPlayersScores":
-                    HashMap<Integer, Integer> scores = parsePlayersScores(args);
-                    setPlayersScores(scores);
-                    break;
-                case "setPlayersNumberOfTiles":
-                    HashMap<Integer, String> numberOfTilesMap = parsePlayersNumberOfTiles(args);
-                    setPlayersNumberOfTiles(numberOfTilesMap);
-                    break;
-                case "addNewPlayer":
-                    int connectedPlayerId = Integer.parseInt(args);
-                    int connectedPlayerScore = 0; // Set the initial score to 0
-                    playersScores.put(connectedPlayerId, connectedPlayerScore);
-                    break;
-                case "setGameOrder":
-                    setGameOrder(args);
-                    break;
-                case "disconnect":
-                    updatePlayerLeft(args);
-                    break;
-                case  "passTurn":
-                    turnPassed();
-                    break;
+           switch (methodName) {
+               case "startGame":
+                   handleStartGame();
+                   break;
+               case "endGame":
+                   handleEndGame();
+                   break;
+               case "setBoardStatus":
+                   myBoard = parseBoardStatus(args);
+                   break;
+               case "setNumberOfTilesInBag":
+                   int numberOfTiles = Integer.parseInt(args);
+                   setNumberOfTilesInBag(numberOfTiles);
+                   break;
+               case "setCurrentPlayerIndex":
+                   setCurrentPlayerIndex(Integer.parseInt(args));
+                   break;
+               case "setPlayersScores":
+                   HashMap<Integer, Integer> scores = parsePlayersScores(args);
+                   setPlayersScores(scores);
+                   break;
+               case "setPlayersNumberOfTiles":
+                   HashMap<Integer, String> numberOfTilesMap = parsePlayersNumberOfTiles(args);
+                   setPlayersNumberOfTiles(numberOfTilesMap);
+                   break;
+               case "addNewPlayer":
+                   int connectedPlayerId = Integer.parseInt(args);
+                   int connectedPlayerScore = 0; // Set the initial score to 0
+                   playersScores.put(connectedPlayerId, connectedPlayerScore);
+                   break;
+               case "setGameOrder":
+                   setGameOrder(args);
+                   break;
+               case "disconnect":
+                   updatePlayerLeft(args);
+                   break;
+               case "passTurn":
+                   turnPassed();
+                   break;
 //                case "undo":
 //                    myBoard = parseBoardStatus(args);
-                case "tryPlaceWord":
-                    wrongWordHandler();
-                    break;
-                default:
-                    System.out.println("Unknown method name: " + methodName);
-                    break;
-            }
-        }
+               case "tryPlaceWord":
+                   wrongWordHandler();
+                   break;
+
+               default:
+                   System.out.println("Unknown method name: " + methodName);
+                   break;
+           }
+       }
+   }
     }
 
     private void wrongWordHandler() {
@@ -302,6 +307,13 @@ public class GuestModel extends PlayerModel implements Observer {
         try {
             this.clientCommunication.socket.close();
         } catch (IOException e) { throw new RuntimeException(e);}
+    }
+    public void close()  {
+        try {
+            clientCommunication.socket.close();
+        }  catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 //    private void undo(){
 //
