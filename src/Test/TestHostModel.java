@@ -94,6 +94,7 @@ public class TestHostModel {
         myServer.start();
         System.out.println("TestHostModel is getting started");
         checkIsValid();
+        System.out.println(Thread.activeCount());
         System.out.println("Done");
         myServer.close();
     }
