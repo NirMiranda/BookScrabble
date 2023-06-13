@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Board {
     int i =0;
-    private static Board b = null;
+    private static Board board = null;
     int num=0;
     Tile[][] table = new Tile[15][15];
     int[][] score = new int[15][15];
@@ -93,15 +93,18 @@ public class Board {
     }
 
     public static Board getBoard() {
-        if (b == null)
-            b = new Board();
-        return b;
+        if (board == null)
+            board = new Board();
+        return board;
     }
 
     public Tile[][] getTile() {
         Tile[][] copy = new Tile[15][15];
         for (int i = 0; i < table.length; i++) {
-            System.arraycopy(table, 0, copy[i], 0, table.length);
+            //System.arraycopy(table, 0, copy[i], 0, table.length);
+            for (int j = 0;j< table.length;j++){
+                copy[i][j]=this.table[i][j];
+            }
         }
         return copy;
     }
@@ -320,7 +323,7 @@ public Word MakeWord(int row, int col,int length,boolean vertical,Tile t) {
     public boolean boardLegal(Word w) {
         if(table[7][7]==null)//firs word
         {
-            return checkLength(w)&& b.IsFirstWordIsLegal(w);
+            return checkLength(w)&& board.IsFirstWordIsLegal(w);
         }
 
         return ((checkLength(w) == true) && (IsTheTileNotEmpty(w) == true) && (IsFirstWordIsLegal(w) == true) && (Isreplacement(w) == true));

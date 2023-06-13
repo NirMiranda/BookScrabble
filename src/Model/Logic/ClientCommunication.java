@@ -3,6 +3,8 @@ package Model.Logic;
 import java.io.*;
 import java.net.Socket;
 import java.util.Observable;
+import java.util.Scanner;
+import java.util.stream.Stream;
 
 /**
  * This class is responsible for the communication between the client and the server.
@@ -76,10 +78,14 @@ public class ClientCommunication extends Observable {
         // Append arguments if present
         if (args != null && args.length > 0) {
             for (String arg : args) {
-                messageBuilder.append(","); // Delimiter between arguments
                 messageBuilder.append(arg);
+                messageBuilder.append(","); // Delimiter between arguments
+
             }
         }
+
+        messageBuilder.deleteCharAt(messageBuilder.length()-1);
+
         return messageBuilder.toString();
     }
 
@@ -102,9 +108,10 @@ public class ClientCommunication extends Observable {
         while (socket.isConnected() && !socket.isClosed()) {
             try {
                 InputStream inputStream = socket.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                Scanner scan = new Scanner(inputStream);
                 String message;
-                if ((message = reader.readLine()) != null) {
+                message = scan.next();
+                if(message!=null){
                     setChanged();
                     notifyObservers(message);
                 }

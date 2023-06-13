@@ -1,21 +1,25 @@
 package Model.Logic;
 
+import Model.Data.Board;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
+import java.util.Scanner;
 
 public class HostServer extends Observable {
+
     private int hostPort;
     private int myServerPort;
     private String myServerIP;
     private volatile boolean stop;
     public ClientHandler clientHandler;
     public HashMap<Integer, Socket> clientsMap;
-    private List<File> listBooks;
 
+    private List<File> listBooks;
     public Socket myServer;
 
     /**
@@ -36,7 +40,9 @@ public class HostServer extends Observable {
         this.clientsMap = new HashMap<>();
         this.clientHandler=ch;
         this.start();
+
     }
+
 
     public void updateObservers(String message){
         setChanged();
@@ -45,19 +51,20 @@ public class HostServer extends Observable {
 
 
     private void runServer() {
+        System.out.println("Start run hostServer");
         ServerSocket server = null;
-        new Thread((this::checkForMessage)).start();
+       //new Thread((this::checkForMessage)).start();
+
         try {
             server = new ServerSocket(hostPort);
-            //need to be here new thread.
 
             while (!stop) {
                 Socket client = server.accept();
-
-                this.clientsMap.put(1,client);
-                //HostModel.getHost().addNewPlayer(client);
+                HostModel.getHost().addNewPlayer(client);
                 // Handle the client connection in a separate thread
-                clientHandler.handleClient(client.getInputStream(), client.getOutputStream());
+                if(client.getInputStream().available()>0) {
+                    clientHandler.handleClient(client.getInputStream(), client.getOutputStream());
+                }
 
                 try {
                     Thread.sleep(250);
@@ -78,24 +85,28 @@ public class HostServer extends Observable {
     private void checkForMessage() {
         // Assuming that the clientsMap contains the client sockets
         while (!stop) {
-            for (Socket clientSocket : this.clientsMap.values()) {
-                try {
-                    // Check if there is any incoming message from the client
-                    InputStream inputStream = clientSocket.getInputStream();
+            for (Socket clientSocket : clientsMap.values()) {
+                    try {
+                            // Check if there is any incoming message from the client
+                            if (clientSocket.getInputStream() != null) {
+                                {
+                                    InputStream inputStream = clientSocket.getInputStream();
+                                    //The code checks if there is any incoming message from the client.If the value is greater than 0, it means there is an incoming message.
+                                    this.clientHandler.handleClient(clientSocket.getInputStream(), clientSocket.getOutputStream());
+                                }
+                            }
 
-                    //The code checks if there is any incoming message from the client.If the value is greater than 0, it means there is an incoming message.
-                    if (inputStream.available() > 0) {
-                        clientHandler.handleClient(inputStream, clientSocket.getOutputStream());
+                    } catch (IOException e) {
                     }
-                } catch (IOException e) {}
-            }
-            try {
-                Thread.sleep(250); //Helps reduce CPU usage and allows you to perform other tasks.
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                }
+                try {
+                    Thread.sleep(250); //Helps reduce CPU usage and allows you to perform other tasks.
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
-    }
+
 
     public void start() {
         new Thread(() -> runServer()).start();
@@ -105,19 +116,18 @@ public class HostServer extends Observable {
         stop = true; // Set the stop flag to true to exit the server loop
 
         // Close all client connections
-        for (Socket clientSocket : clientsMap.values()) {
-            try {
-                clientSocket.close();
-            } catch (IOException e) {
-            }
-        }
+//        for (Socket clientSocket : clientsMap.values()) {
+//            try {
+//                clientSocket.close();
+//            } catch (IOException e) {
+//            }
+//        }
 
         // Clear the clients map
         clientsMap.clear();
 
         // Notify observers of the server closure
-        setChanged();
-        notifyObservers("Server closed");
+        updateObservers("0;closeGame");
         // updateAllClient("1;serverClosed");
     }
 
@@ -129,7 +139,7 @@ public class HostServer extends Observable {
      */
     public void updateAllClient(String message) {
         // Iterate over the connected clients
-        for (Socket clientSocket : clientsMap.values()) {
+        for (Socket clientSocket : this.clientsMap.values()) {
             try {
                 // Send the update message to each client
                 clientSocket.getOutputStream().write(message.getBytes());
@@ -149,7 +159,7 @@ public class HostServer extends Observable {
      */
     public Socket sendToMyServer(String letter, String word) {
         try {
-            myServer = new Socket(myServerIP, myServerPort);
+            this.myServer = new Socket(this.myServerIP, this.myServerPort);
             PrintWriter myServerOut = new PrintWriter(myServer.getOutputStream());
             StringBuilder message = new StringBuilder();
             message.append(letter);

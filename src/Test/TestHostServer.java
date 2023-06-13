@@ -20,6 +20,7 @@ public class TestHostServer {
         public String message = null;
 
         public TestHostModel(Observable o) {
+
             o.addObserver(this);
         }
 
@@ -54,7 +55,7 @@ public class TestHostServer {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        c1.send(1, "tryPlaceWord", "1", "2", "3"); //client Communication ---> HostServer
+        c1.send(1, "tryPlaceWord", "nini","1", "2", "3"); //client Communication ---> HostServer
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -83,6 +84,7 @@ public class TestHostServer {
     public static void main(String[] args) {
 
         MyServer myServer = new MyServer(1234, new ClientHandler() {
+
             @Override
             public void handleClient(InputStream inFromclient, OutputStream outToClient) throws IOException {
                 Scanner scan = new Scanner(inFromclient);

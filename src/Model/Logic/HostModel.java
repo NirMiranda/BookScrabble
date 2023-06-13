@@ -11,10 +11,12 @@ import java.util.stream.Collectors;
 
 
 public class HostModel extends PlayerModel implements Observer {
+    private static HostModel hostModel = null;
     private HashMap<Integer, Player> connectedPlayers;
     private HashMap<Integer, String> playersNumberOfTiles = new HashMap<>();
-    private static HostServer hostServer;
-    private Board board;
+    private  static HostServer hostServer;
+
+    public Board board;
     private Tile[][] prevBoard;
     private Tile.Bag bag;
     public int currentPlayerIndex;
@@ -22,36 +24,42 @@ public class HostModel extends PlayerModel implements Observer {
     private List<Player> turnsOrder;
     boolean isMyTurn = false;
 
+    int quantities = 98;
 
     public HashMap<Integer,Integer> playersScores;
 
-    public HostModel(HostServer hostServer) { //when the game is started
+    public HostModel(HostServer hs) { //when the game is started
+        hostServer=hs;
+        hs.addObserver(this);
         this.connectedPlayers = new HashMap<>();
-        myPlayer.id=0;
+        this.playersScores=new HashMap<>();
+        myPlayer=new Player(0,"first",0,new ArrayList<>());
         connectedPlayers.put(0,myPlayer);
-        this.board = new Board();
+        playersScores.put(0,0);
+        board = Board.getBoard();
         this.prevBoard = this.board.getTile();
         this.bag = Tile.Bag.getBag();
-//        this.turnsMap=new HashMap<>();
-        this.playersScores=new HashMap<>();
+//      this.turnsMap=new HashMap<>();
         turnsOrder = new ArrayList<>();
 
     }
 
-    private static HostModel hostModel;
-    //methods
 
+    //methods
+    public static HostModel getHostModel(HostServer hostServer) {
+        if (hostModel == null)
+            hostModel = new HostModel(hostServer);
+        return hostModel;
+    }
     public void addNewPlayer(Socket socket) {
         Player player = new Player(idGenerator(),null,0,null);
         connectedPlayers.put(player.id,player);
-        try {
-            socket.connect(socket.getRemoteSocketAddress());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        playersScores.put(player.id,0);
+        hostServer.clientsMap.put(player.id,socket);
+//
     }
     public int idGenerator(){
-        return connectedPlayers.size()+1;
+        return connectedPlayers.size();
     }
 
     public static HostModel getHost() {
@@ -139,16 +147,19 @@ public class HostModel extends PlayerModel implements Observer {
     }
     private void setPlayersNumberOfTiles(){
         for(Integer id:this.connectedPlayers.keySet())
-        this.playersNumberOfTiles.put(id,String.valueOf(connectedPlayers.get(id).tiles.size()));
+            this.playersNumberOfTiles.put(id,String.valueOf(connectedPlayers.get(id).tiles.size()));
     }
 
     @Override
     public void update(Observable o, Object arg) {
         String updateFromServer = (String)arg;
+        String args = null;
         String[] parts = updateFromServer.split(";");
         int id= Integer.valueOf(parts[0]);
         String methodName = parts[1];
-        String args = parts[2];
+        if(parts.length>=3) {
+            args = parts[2];
+        }
         switch (methodName){
             case "passTurn":
                 passTurn();
@@ -168,11 +179,16 @@ public class HostModel extends PlayerModel implements Observer {
             case "tryPlaceWord":
                 wordIsValid(args,id);
                 break;
-            case "playerConnected" :
+            case "connect":
                 addNewPlayer(hostServer.clientsMap.get(id));
+                System.out.println("The host get that the guest is connect" + updateFromServer);
                 break;
             case "challenge":
                 challengeScoreUpdate(id,args);
+                break;
+            case "closeGame":
+                endGame();
+                break;
         }
     }
 
@@ -188,20 +204,22 @@ public class HostModel extends PlayerModel implements Observer {
     private String boardParser(Board board) {
         Tile[][] tiles = board.getTile();
         StringBuilder sb = new StringBuilder();
-        sb.append(myPlayer.id).append( ";setBoardStatus;");
         for (int row = 0; row < tiles.length; row++) {
             for (int col = 0; col < tiles[row].length; col++) {
                 Tile tile = tiles[row][col];
-                sb.append(row).append(":").append(col).append("=").append(tile.getLetter()).append(",");
+                sb.append(row).append(":").append(col).append("=");
+                if(tile == null){
+                    sb.append("null").append(",");
+                }
+                else sb.append(tile.getLetter()).append(",");
             }
         }
         // Remove the trailing comma, if any
         sb.deleteCharAt(sb.length()-1);
-        return  sb.toString();
-    }
+
+        return  sb.toString();}
     private String scoreParser(HashMap<Integer, Integer> playersScores) {
         StringBuilder sb = new StringBuilder();
-        sb.append(myPlayer.id).append(";setScoresStatus;");
         for(Integer id:playersScores.keySet()){
             sb.append(id).append(":").append(playersScores.get(id)).append(",");
         }
@@ -215,7 +233,7 @@ public class HostModel extends PlayerModel implements Observer {
     }
 
     private void setCurrentPlayerIndex(){
-        this.currentPlayerIndex=(this.currentPlayerIndex+1)%connectedPlayers.size();
+        this.currentPlayerIndex=(this.currentPlayerIndex+1)%(connectedPlayers.size());
     }
 
     private void setNumberOfTilesInBag(){
@@ -276,7 +294,7 @@ public class HostModel extends PlayerModel implements Observer {
     }
     public void startGame(){
         if(this.connectedPlayers.size()==4)
-        setGameOrder();
+            setGameOrder();
         hostServer.updateAllClient(boardParser(board));
         hostServer.updateAllClient(scoreParser(playersScores));
         hostServer.updateAllClient(myPlayer.id + ";setCurrentPlayerIndex;" + currentPlayerIndex);
@@ -294,25 +312,35 @@ public class HostModel extends PlayerModel implements Observer {
             for (char c : myWord.toCharArray()) {
                 t.add(Tile.Bag.getBag().getTile(c));
             }
-            Word w = new Word((Tile[]) t.toArray(), row, col, isVert);
-            int score = board.tryPlaceWord(w);
+            Tile[] help = new Tile[t.size()];
+            for (int i = 0 ;i<t.size();i++){
+                help[i]=t.get(i);
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            Word w = new Word(help, row, col, isVert);
+            int score = this.board.tryPlaceWord(w);
             if (score > 0) {
                 connectedPlayers.get(id).score += score;
             }
-            setBoardStatus(board.getTile());
-            removeTileFromHand(myWord, id);
-            if(bag.getSize()>0) {
-                fillHand(connectedPlayers.get(id));
-            }
-            else setPlayersNumberOfTiles();
+//            setBoardStatus(Board.getBoard().getTile());
+           // removeTileFromHand(myWord, id);
+//            if (bag.getSize() > 0) {
+//                fillHand(connectedPlayers.get(id));
+//            } else setPlayersNumberOfTiles();
+
             playersScores.replace(id, playersScores.get(id) + score);
             setCurrentPlayerIndex();
-            hostServer.updateAllClient(boardParser(board));
-            hostServer.updateAllClient(scoreParser(playersScores));
+           hostServer.updateAllClient(myPlayer.id + ";setBoardStatus;" + boardParser(Board.getBoard()));
+            hostServer.updateAllClient(myPlayer.id + "setPlayerScores" + scoreParser(playersScores));
             hostServer.updateAllClient(myPlayer.id + ";setCurrentPlayerIndex;" + currentPlayerIndex);
-            hostServer.updateAllClient(myPlayer.id + ";setNumberOfTilesInBag;" + bag.getQuantities());
+            hostServer.updateAllClient(myPlayer.id + ";setNumberOfTilesInBag;" +(quantities-help.length));
+        }else {
+            hostServer.sendToPlayerMessage(id,"tryPlaceWord","false");
         }
-        hostServer.sendToPlayerMessage(id,"tryPlaceWord","false");
     }
 
 
@@ -336,10 +364,13 @@ public class HostModel extends PlayerModel implements Observer {
             String[] positionParts = tileParts[0].split(":");
             int row = Integer.parseInt(positionParts[0]);
             int col = Integer.parseInt(positionParts[1]);
-            char value = tileParts[1].charAt(0);
-
-            // Create a new Tile object with the value and add it to the board
-            myBoard[row][col] = value;
+            if(tileParts[1].equals("null")){
+                myBoard[row][col]= '-';
+            }
+            else {
+                char value = tileParts[1].charAt(0);
+                myBoard[row][col] = value;
+            }
 
         }
 
@@ -348,3 +379,5 @@ public class HostModel extends PlayerModel implements Observer {
 
 
 }
+
+
