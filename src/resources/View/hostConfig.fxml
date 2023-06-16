@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="610.0" prefWidth="875.0" stylesheets="@../background.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.HostController">
+    <center>
+        <VBox alignment="CENTER" fillWidth="false" maxHeight="-Infinity" prefHeight="519.0" prefWidth="875.0" BorderPane.alignment="TOP_CENTER">
+            <children>
+
+                <Label fx:id="welcomeText" alignment="CENTER" prefHeight="79.0" prefWidth="451.0" text="Host configuration:" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
+                    <font>
+                        <Font name="Droid Sans" size="49.0" />
+                    </font>
+                    <padding>
+                        <Insets bottom="20.0" />
+                    </padding>
+                </Label>
+                <TextField fx:id="nameTextFiled" alignment="CENTER" minHeight="37.0" minWidth="321.0" prefHeight="37.0" prefWidth="321.0" promptText="Enter Player nickname:">
+                    <VBox.margin>
+                        <Insets bottom="20.0" />
+                    </VBox.margin>
+                    <font>
+                        <Font name="Apple Braille" size="13.0" />
+                    </font>
+                </TextField>
+
+                <TextField fx:id="portField" alignment="CENTER" prefHeight="37.0" prefWidth="321.0" promptText="Enter host port">
+                    <font>
+                        <Font name="Apple Braille" size="13.0" />
+                    </font>
+                </TextField>
+            <TextField fx:id="nameTextFiled1" alignment="CENTER" layoutX="287.0" layoutY="157.0" minHeight="37.0" minWidth="321.0" prefHeight="37.0" prefWidth="321.0" promptText="Enter host IP">
+               <font>
+                  <Font name="Apple Braille" size="13.0" />
+               </font>
+            </TextField>
+
+                <Button alignment="CENTER" contentDisplay="CENTER" onAction="#switchToGameWindow" prefHeight="63.0" prefWidth="314.0" stylesheets="@../buttonStyleSheets.css" text="Start game">
+                    <font>
+                        <Font name="Apple Braille" size="29.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets top="20.0" />
+                    </VBox.margin>
+                    <opaqueInsets>
+                        <Insets />
+                    </opaqueInsets>
+                </Button>
+            </children>
+        </VBox>
+    </center>
+    <top>
+        <Group BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets top="100.0" />
+            </BorderPane.margin>
+        </Group>
+    </top>
+</BorderPane>

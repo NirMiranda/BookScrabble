@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="800.0" prefWidth="1400.0" stylesheets="@../background.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.GuestController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <AnchorPane prefHeight="834.0" prefWidth="1510.0">
+        <Label fx:id="invalidIPorPort" layoutX="186.0" layoutY="139.0" prefHeight="56.0" prefWidth="391.0" textAlignment="CENTER" textOverrun="CLIP" underline="true" wrapText="true">
+            <font>
+                <Font size="39.0" />
+            </font>
+        </Label>
+    </AnchorPane>
+    <bottom>
+        <BorderPane BorderPane.alignment="CENTER">
+            <center>
+                <Pane />
+            </center>
+        </BorderPane>
+    </bottom>
+    <center>
+        <VBox alignment="TOP_CENTER">
+            <children>
+                <Group>
+                    <children>
+                        <Label layoutX="-78.0" layoutY="15.0" prefHeight="53.0" prefWidth="168.0" text="Port:" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
+                            <font>
+                                <Font name="Droid Sans Bold" size="39.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="IpTextFiled" layoutX="-340.0" layoutY="24.0" prefHeight="37.0" prefWidth="252.0" promptText="Enter host IP" />
+                        <Label layoutX="-404.0" layoutY="8.0" prefHeight="69.0" prefWidth="88.0" text="Ip:" textOverrun="CLIP" wrapText="true">
+                            <font>
+                                <Font name="Droid Sans Bold" size="39.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="PortTextFiled" layoutX="39.0" layoutY="24.0" prefHeight="37.0" prefWidth="321.0" promptText="Enter host port" />
+                        <Label layoutX="-260.0" layoutY="90.0" prefHeight="53.0" prefWidth="168.0" text="Name:" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
+                            <font>
+                                <Font name="Droid Sans Bold" size="39.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="nameTextFiled" layoutX="-78.0" layoutY="99.0" prefHeight="37.0" prefWidth="321.0" promptText="Please enter your name" />
+                    </children>
+                </Group>
+                <Group>
+                    <children>
+                        <Button fx:id="submitBtn" alignment="CENTER" onAction="#onPressSubmit" prefHeight="82.0" prefWidth="273.0" stylesheets="@../buttonStyleSheets.css" text="Connect">
+                            <font>
+                                <Font size="39.0" />
+                            </font>
+                        </Button>
+                        <Button fx:id="switchToGame" layoutY="55.0" onAction="#switchToGameWindow" prefHeight="46.0" prefWidth="183.0" stylesheets="@../buttonStyleSheets.css" text="Start" visible="false">
+                            <font>
+                                <Font size="49.0" />
+                            </font>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                        </Button>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="40.0" />
+                    </VBox.margin>
+                </Group>
+            </children>
+        </VBox>
+    </center>
+    <top>
+        <Label fx:id="welcomeText" prefHeight="124.0" prefWidth="481.0" text="Guest mode" textAlignment="CENTER" textOverrun="CLIP" wrapText="true" BorderPane.alignment="CENTER">
+            <font>
+                <Font size="85.0" />
+            </font>
+            <BorderPane.margin>
+                <Insets bottom="35.0" top="100.0" />
+            </BorderPane.margin>
+        </Label>
+    </top>
+</BorderPane>
