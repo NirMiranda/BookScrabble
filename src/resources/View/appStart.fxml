@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane fx:id="mainWindow" prefHeight="610.0" prefWidth="875.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.welcomeController">
+    <bottom>
+        <Group BorderPane.alignment="CENTER">
+            <children>
+                <Button layoutX="313.0" layoutY="-84.0" onAction="#switchToGuestWindow" prefHeight="103.0" prefWidth="230.0" stylesheets="@../buttonStyleSheets.css" text="Guest mode">
+                    <font>
+                        <Font size="34.0" />
+                    </font>
+                </Button>
+                <Button layoutX="77.0" layoutY="-84.0" onAction="#switchToHostWindow" prefHeight="103.0" prefWidth="222.0" stylesheets="@../buttonStyleSheets.css" text="Host mode">
+                    <font>
+                        <Font size="34.0" />
+                    </font>
+                </Button>
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+            </BorderPane.margin>
+        </Group>
+    </bottom>
+   <center>
+        <Label fx:id="welcomeText" prefHeight="128.0" prefWidth="275.0" text="Choose mode:" textAlignment="CENTER" textOverrun="CLIP" wrapText="true" BorderPane.alignment="CENTER">
+            <font>
+                <Font name="Droid Sans" size="39.0" />
+            </font>
+        </Label>
+   </center>
+</BorderPane>
