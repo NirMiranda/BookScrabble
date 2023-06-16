@@ -143,3 +143,5 @@ public class BoardAppeareance extends Canvas {
         redraw();
     }
 }
+
+//t

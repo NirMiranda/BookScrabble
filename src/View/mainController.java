@@ -17,7 +17,6 @@ class mainController {
 
     @FXML
     private Label welcomeLabel;
-
     @FXML
     public void onHostGameButtonClicked() throws Exception {
         Screen screen = Screen.getPrimary();
@@ -45,3 +44,4 @@ class mainController {
         stage.show();
     }
 }
+//t
